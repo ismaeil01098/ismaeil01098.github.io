@@ -1,159 +1,118 @@
+<!-- ملف: dashboard.html -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة التحكم - منصة العلوم</title>
+  <title>لوحة تحكم المنصة</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
-    body { margin: 0; font-family: 'Tajawal', sans-serif; background: #f9f9f9; color: #333; }
+    body { font-family: 'Tajawal', sans-serif; margin: 0; background: #f4f4f4; color: #333; }
     .overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); display: flex;
-      align-items: center; justify-content: center; z-index: 999;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999;
     }
     .password-box {
-      background: #fff; padding: 1.5rem; border-radius: 10px;
-      width: 90%; max-width: 320px; text-align: center;
-      box-shadow: 0 0 12px rgba(0,0,0,0.3);
+      background: #fff; padding: 2rem; border-radius: 10px; width: 90%; max-width: 320px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4); text-align: center;
     }
-    .password-box input {
-      width: 100%; padding: 0.7rem; font-size: 1rem;
-      margin-top: 0.7rem; border-radius: 6px; border: 1px solid #ccc;
-    }
+    .password-box input { width: 100%; padding: 10px; margin-top: 1rem; border-radius: 6px; border: 1px solid #ccc; }
     .password-box button {
-      margin-top: 1rem; padding: 0.7rem 1.5rem;
-      background: #b6a564; color: #fff; border: none;
-      border-radius: 6px; cursor: pointer; font-size: 1rem;
+      background: #b6a564; color: white; border: none;
+      padding: 10px 20px; border-radius: 6px; margin-top: 1rem; cursor: pointer;
     }
 
     .container { display: flex; min-height: 100vh; }
     .sidebar {
-      width: 60px; background: #222; color: #fff; transition: width 0.3s;
+      background: #1d1c19; color: white; width: 200px; transition: 0.3s;
+      padding-top: 1rem; flex-shrink: 0;
     }
-    .sidebar.expanded { width: 200px; }
-    .sidebar .toggle {
-      padding: 1rem; cursor: pointer; text-align: center;
-      background: #111; font-size: 1.2rem;
+    .sidebar h3 { text-align: center; margin-bottom: 2rem; font-size: 1.2rem; }
+    .sidebar button {
+      display: block; width: 100%; padding: 0.8rem 1rem;
+      background: none; color: white; text-align: right; border: none;
+      font-size: 1rem; cursor: pointer;
     }
-    .sidebar ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar li {
-      padding: 0.9rem 1rem; cursor: pointer; display: flex; align-items: center;
-    }
-    .sidebar li:hover { background: #333; }
-    .sidebar li span.text { margin-right: 0.6rem; opacity: 0; transition: 0.3s; }
-    .sidebar.expanded li span.text { opacity: 1; }
+    .sidebar button:hover { background: #333; }
 
-    .main { flex: 1; padding: 1rem; overflow-y: auto; }
+    .main { flex: 1; padding: 1rem; }
 
-    h2 { margin-top: 0; font-size: 1.3rem; color: #333; }
+    .hidden { display: none; }
+    h2 { font-size: 1.2rem; margin-bottom: 1rem; }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-    th, td {
-      border: 1px solid #ccc; padding: 0.6rem;
-      font-size: 0.9rem; text-align: center;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.95rem; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     th { background: #b6a564; color: white; }
 
-    button.action {
-      padding: 0.4rem 0.7rem; font-size: 0.8rem;
-      margin: 0 0.2rem; border: none; border-radius: 5px;
-      cursor: pointer;
-    }
-    .active-btn { background: #3ab54a; color: white; }
-    .inactive-btn { background: #ec5353; color: white; }
-    .delete-btn { background: #555; color: white; }
+    .btn { padding: 6px 10px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; margin: 0 3px; }
+    .btn.green { background: #3ab54a; color: white; }
+    .btn.red { background: #ec5353; color: white; }
+    .btn.gray { background: #555; color: white; }
 
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    .form-group label {
-      display: block; margin-bottom: 0.3rem; font-weight: bold;
-    }
-    .form-group textarea, .form-group select {
-      width: 100%; padding: 0.6rem; border-radius: 5px; border: 1px solid #ccc;
-      font-size: 0.9rem;
+    textarea, select, input[type=text] {
+      width: 100%; padding: 0.5rem; margin-bottom: 0.8rem; border-radius: 6px; border: 1px solid #ccc;
     }
 
-    @media (max-width: 600px) {
+    @media(max-width: 600px) {
       .sidebar { display: none; }
-      .container { flex-direction: column; }
+      .main { padding: 0.5rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- شاشة كلمة المرور -->
-<div class="overlay" id="overlay">
+<!-- حماية بكلمة مرور -->
+<div id="overlay" class="overlay">
   <div class="password-box">
     <h3>أدخل كلمة المرور</h3>
-    <input type="password" id="admin-pass" />
+    <input type="password" id="admin-pass" placeholder="•••••••••••">
     <button onclick="checkPassword()">دخول</button>
-    <div id="pass-error" style="margin-top:0.5rem; color:red;"></div>
+    <div id="pass-error" style="color:red; margin-top:0.5rem;"></div>
   </div>
 </div>
 
 <!-- لوحة التحكم -->
 <div class="container" id="dashboard" style="display:none;">
-  <!-- الشريط الجانبي -->
-  <div class="sidebar" id="sidebar">
-    <div class="toggle" onclick="toggleSidebar()">☰</div>
-    <ul>
-      <li onclick="showSection('students')"><span class="text">👥 الطلاب</span></li>
-      <li onclick="showSection('stats')"><span class="text">📊 الإحصائيات</span></li>
-      <li onclick="showSection('announce')"><span class="text">🔔 الإعلانات</span></li>
-    </ul>
+  <div class="sidebar">
+    <h3>لوحة التحكم</h3>
+    <button onclick="showSection('students')">👥 الطلاب</button>
+    <button onclick="showSection('stats')">📊 الإحصائيات</button>
+    <button onclick="showSection('announce')">🔔 إعلان</button>
   </div>
-
-  <!-- الصفحة الرئيسية -->
   <div class="main">
-    <!-- قسم الطلاب -->
-    <section id="students">
-      <h2>قائمة الطلاب</h2>
+    <!-- الطلاب -->
+    <div id="students" class="section hidden">
+      <h2>إدارة الطلاب</h2>
       <table>
-        <thead>
-          <tr>
-            <th>الهاتف</th>
-            <th>الاسم</th>
-            <th>المرحلة</th>
-            <th>المحافظة</th>
-            <th>مفعل؟</th>
-            <th>الإجراءات</th>
-          </tr>
-        </thead>
+        <thead><tr><th>الاسم</th><th>الهاتف</th><th>المرحلة</th><th>التفعيل</th><th>إجراءات</th></tr></thead>
         <tbody id="students-body"></tbody>
       </table>
-    </section>
+    </div>
 
-    <!-- قسم الإحصائيات -->
-    <section id="stats" style="display:none;">
-      <h2>إحصائيات المنصة</h2>
-      <p>عدد الطلاب: <span id="total-students">0</span></p>
-      <p>عدد المفعلين: <span id="active-students">0</span></p>
-    </section>
+    <!-- الإحصائيات -->
+    <div id="stats" class="section hidden">
+      <h2>الإحصائيات</h2>
+      <p>📌 عدد الطلاب: <span id="stat-total">0</span></p>
+      <p>📌 عدد المشتركين: <span id="stat-active">0</span></p>
+    </div>
 
-    <!-- قسم الإعلانات -->
-    <section id="announce" style="display:none;">
-      <h2>إرسال إعلان</h2>
-      <div class="form-group">
-        <label>اختر المرحلة</label>
-        <select id="ann-stage">
-          <option value="grade4">الصف الرابع</option>
-          <option value="grade5">الصف الخامس</option>
-          <option value="grade6">الصف السادس</option>
-          <option value="prep1">الأول الإعدادي</option>
-          <option value="prep2">الثاني الإعدادي</option>
-          <option value="prep3">الثالث الإعدادي</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>نص الإعلان</label>
-        <textarea id="ann-text" rows="3" placeholder="نص الإعلان..."></textarea>
-      </div>
-      <button class="action active-btn" onclick="sendAnn()">نشر</button>
-    </section>
+    <!-- إعلان -->
+    <div id="announce" class="section hidden">
+      <h2>نشر إعلان جديد</h2>
+      <select id="stage-select">
+        <option value="grade4">الصف الرابع</option>
+        <option value="grade5">الصف الخامس</option>
+        <option value="grade6">الصف السادس</option>
+        <option value="prep1">الصف الأول الإعدادي</option>
+        <option value="prep2">الصف الثاني الإعدادي</option>
+        <option value="prep3">الصف الثالث الإعدادي</option>
+      </select>
+      <textarea id="ann-text" rows="4" placeholder="اكتب نص الإعلان هنا..."></textarea>
+      <button class="btn green" onclick="submitAnn()">نشر الإعلان</button>
+    </div>
   </div>
 </div>
 
@@ -170,88 +129,84 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  function checkPassword(){
-    const p = document.getElementById("admin-pass").value.trim();
-    if(p === "islamemad01122104598"){
+  function checkPassword() {
+    const pass = document.getElementById("admin-pass").value.trim();
+    if (pass === "islamemad01122104598") {
       document.getElementById("overlay").style.display = "none";
       document.getElementById("dashboard").style.display = "flex";
-      showSection('students');
+      showSection("students");
       loadStudents();
+      loadStats();
     } else {
-      document.getElementById("pass-error").innerText = "كلمة المرور خاطئة";
+      document.getElementById("pass-error").innerText = "كلمة المرور غير صحيحة";
     }
   }
 
-  function toggleSidebar(){
-    document.getElementById("sidebar").classList.toggle("expanded");
+  function showSection(id) {
+    document.querySelectorAll(".section").forEach(el => el.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
   }
 
-  function showSection(id){
-    ['students','stats','announce'].forEach(sec=>{
-      document.getElementById(sec).style.display = (sec === id) ? 'block' : 'none';
-    });
-    if(id==='stats') loadStats();
-  }
-
-  function loadStudents(){
-    const tbody = document.getElementById("students-body");
-    tbody.innerHTML = '';
-    db.ref("users/students").once("value").then(snap=>{
+  function loadStudents() {
+    const body = document.getElementById("students-body");
+    body.innerHTML = "";
+    db.ref("users/students").once("value").then(snap => {
       const data = snap.val() || {};
-      Object.entries(data).forEach(([phone, stu])=>{
+      Object.entries(data).forEach(([phone, info]) => {
         const row = document.createElement("tr");
         row.innerHTML = `
+          <td>${info.name}</td>
           <td>${phone}</td>
-          <td>${stu.name}</td>
-          <td>${stu.stage}</td>
-          <td>${stu.governorate}</td>
-          <td>${stu.subscription?.active ? "✅" : "❌"}</td>
+          <td>${info.stage}</td>
+          <td>${info.subscription?.active ? '✅' : '❌'}</td>
           <td>
-            <button class="action ${stu.subscription?.active ? 'inactive-btn' : 'active-btn'}"
-              onclick="toggleActivation('${phone}', ${stu.subscription?.active})">
-              ${stu.subscription?.active ? 'إلغاء' : 'تفعيل'}
+            <button class="btn ${info.subscription?.active ? 'red' : 'green'}"
+              onclick="toggleUser('${phone}', ${info.subscription?.active})">
+              ${info.subscription?.active ? 'إلغاء التفعيل' : 'تفعيل'}
             </button>
-            <button class="action delete-btn" onclick="deleteStudent('${phone}')">حذف</button>
+            <button class="btn gray" onclick="deleteUser('${phone}')">حذف</button>
           </td>
         `;
-        tbody.appendChild(row);
+        body.appendChild(row);
       });
     });
   }
 
-  function toggleActivation(phone, current){
+  function toggleUser(phone, current) {
     db.ref(`users/students/${phone}/subscription/active`).set(!current).then(loadStudents);
   }
 
-  function deleteStudent(phone){
-    if(confirm("هل أنت متأكد من الحذف؟")){
+  function deleteUser(phone) {
+    if (confirm("هل تريد حذف الطالب؟")) {
       db.ref(`users/students/${phone}`).remove().then(loadStudents);
     }
   }
 
-  function loadStats(){
-    db.ref("users/students").once("value").then(snap=>{
+  function loadStats() {
+    db.ref("users/students").once("value").then(snap => {
       const data = snap.val() || {};
-      document.getElementById("total-students").innerText = Object.keys(data).length;
-      document.getElementById("active-students").innerText = Object.values(data).filter(s=>s.subscription?.active).length;
+      const total = Object.keys(data).length;
+      const active = Object.values(data).filter(s => s.subscription?.active).length;
+      document.getElementById("stat-total").innerText = total;
+      document.getElementById("stat-active").innerText = active;
     });
   }
 
-  function sendAnn(){
-    const stage = document.getElementById("ann-stage").value;
-    const msg = document.getElementById("ann-text").value.trim();
-    if(!msg) return alert("اكتب نص الإعلان");
-    const id = 'notif'+Date.now();
+  function submitAnn() {
+    const stage = document.getElementById("stage-select").value;
+    const text = document.getElementById("ann-text").value.trim();
+    if (!text) return alert("برجاء كتابة نص الإعلان");
+
+    const id = "notif" + Date.now();
     db.ref(`notifications/${stage}/${id}`).set({
-      message: msg,
+      message: text,
       scheduledAt: new Date().toISOString(),
       repeat: "NONE"
-    }).then(()=>{
-      alert("✅ تم نشر الإعلان");
+    }).then(() => {
+      alert("تم نشر الإعلان");
       document.getElementById("ann-text").value = "";
     });
   }
 </script>
-
 </body>
 </html>
