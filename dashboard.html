@@ -9,153 +9,145 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
     body { margin:0; font-family:'Tajawal',sans-serif; background:#f4f4f4; color:#333; }
-
     .overlay {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.8); z-index:999;
-      display:flex; align-items:center; justify-content:center;
+      position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85);
+      display:flex; align-items:center; justify-content:center; z-index:1000;
     }
-
     .password-box {
-      background:#fff; padding:1.5rem; border-radius:10px;
-      width:90%; max-width:320px; text-align:center;
+      background:#fff; padding:1.5rem; border-radius:10px; width:90%; max-width:320px;
+      text-align:center; box-shadow:0 0 10px rgba(0,0,0,0.3);
     }
-
     .password-box input {
-      width:100%; padding:0.7rem; margin-top:0.5rem;
-      border:1px solid #ccc; border-radius:5px; font-size:1rem;
+      width:100%; padding:0.7rem; margin-top:0.5rem; border:1px solid #ccc; border-radius:5px;
+      font-size:1rem;
     }
-
     .password-box button {
-      margin-top:1rem; padding:0.7rem 1rem;
-      background:#b6a564; color:#fff; border:none;
+      margin-top:1rem; padding:0.7rem 1rem; background:#b6a564; color:#fff; border:none;
       border-radius:5px; font-size:1rem; cursor:pointer;
     }
-
-    .container { display: flex; height: 100vh; }
-
-    .sidebar {
-      width: 200px;
-      background: #8a6f00; /* لون واضح مؤقت */
-      color: white;
-      padding-top: 1rem;
+    .topnav {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:0.6rem;
+      background:#24221e; color:#fff; padding:0.7rem 0; font-size:0.95rem;
     }
-
-    .sidebar ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar li {
-      padding: 0.8rem 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    .topnav div {
+      cursor:pointer; padding:0.4rem 1.2rem; border-radius:20px;
+      background:#b6a564; color:#fff; transition:0.3s;
     }
-    .sidebar li:hover {
-      background: #6a5800;
-    }
+    .topnav div:hover { background:#9f8f4b; }
+    .main { padding:1rem; max-width:1000px; margin:auto; }
+    section { display:none; margin-top:1.5rem; }
+    h2 { font-size:1.2rem; margin-bottom:1rem; }
 
-    .main {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-    }
+    table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    th,td { padding:0.5rem; border:1px solid #ccc; text-align:center; }
+    th { background:#b6a564; color:#fff; }
 
-    h2 { margin-top: 0; font-size: 1.3rem; }
+    .action { padding:0.4rem 0.7rem; font-size:0.8rem; border:none; border-radius:4px; cursor:pointer; }
+    .active-btn { background:#3ab54a; color:#fff; }
+    .inactive-btn { background:#ec5353; color:#fff; }
+    .delete-btn { background:#777; color:#fff; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-
-    th {
-      background-color: #b6a564;
-      color: white;
-    }
-
-    button.action {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.8rem;
-      margin: 0 0.2rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .active-btn { background: #3ab54a; color: white; }
-    .inactive-btn { background: #ec5353; color: white; }
-    .delete-btn { background: #555; color: white; }
-
-    @media (max-width: 600px) {
-      .container { flex-direction: column; }
-      .sidebar { width: 100%; display: block; }
-      .sidebar li { display: inline-block; width: 33%; text-align: center; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:0.4rem; font-size:0.9rem; }
+    .form-group input, .form-group textarea, .form-group select {
+      width:100%; padding:0.5rem; border-radius:5px; border:1px solid #ccc;
+      font-size:0.9rem;
     }
   </style>
 </head>
 <body>
 
+<!-- نافذة كلمة المرور -->
 <div id="overlay" class="overlay">
   <div class="password-box">
-    <h3>أدخل كلمة المرور</h3>
-    <input type="password" id="admin-pass" placeholder="••••••••••••" />
+    <h3>دخول لوحة التحكم</h3>
+    <input type="password" id="admin-pass" placeholder="كلمة المرور" />
     <button onclick="checkPassword()">دخول</button>
-    <div id="pass-error" style="color:#ec5353; margin-top:0.5rem;"></div>
+    <div id="pass-error" style="color:red; margin-top:0.6rem;"></div>
   </div>
 </div>
 
-<div class="container" id="dashboard" style="display:none;">
-  <nav class="sidebar">
-    <ul>
-      <li onclick="showSection('students')">👥 الطلاب</li>
-      <li onclick="showSection('stats')">📊 الإحصائيات</li>
-      <li onclick="showSection('announce')">🔔 الإعلانات</li>
-    </ul>
-  </nav>
-
-  <main class="main">
-    <section id="students" style="display:none;">
+<!-- لوحة التحكم -->
+<div id="dashboard" style="display:none;">
+  <div class="topnav">
+    <div onclick="showSection('students')">👥 الطلاب</div>
+    <div onclick="showSection('content')">📁 المحتوى</div>
+    <div onclick="showSection('announce')">🔔 الإعلانات</div>
+    <div onclick="showSection('stats')">📊 الإحصائيات</div>
+  </div>
+  <div class="main">
+    <!-- قسم الطلاب -->
+    <section id="students">
       <h2>قائمة الطلاب</h2>
       <table>
         <thead>
           <tr>
-            <th>الهاتف</th>
-            <th>الاسم</th>
-            <th>المرحلة</th>
-            <th>المحافظة</th>
-            <th>مشترك</th>
-            <th>إجراءات</th>
+            <th>رقم الهاتف</th><th>الاسم</th><th>المرحلة</th><th>المحافظة</th><th>مفعل؟</th><th>إجراءات</th>
           </tr>
         </thead>
         <tbody id="students-body"></tbody>
       </table>
     </section>
 
-    <section id="stats" style="display:none;">
-      <h2>الإحصائيات</h2>
-      <p>عدد الطلاب: <span id="total-students">0</span></p>
-      <p>عدد المشتركين: <span id="active-subscribers">0</span></p>
+    <!-- قسم المحتوى -->
+    <section id="content">
+      <h2>إضافة محتوى</h2>
+      <div class="form-group"><label>المرحلة الدراسية</label>
+        <select id="content-stage">
+          <option value="grade4">الصف الرابع</option>
+          <option value="grade5">الصف الخامس</option>
+          <option value="grade6">الصف السادس</option>
+          <option value="prep1">الأول الإعدادي</option>
+          <option value="prep2">الثاني الإعدادي</option>
+          <option value="prep3">الثالث الإعدادي</option>
+        </select>
+      </div>
+      <div class="form-group"><label>نوع المحتوى</label>
+        <select id="content-type">
+          <option value="video">فيديو</option>
+          <option value="file">ملف</option>
+          <option value="quiz">اختبار</option>
+        </select>
+      </div>
+      <div class="form-group"><label>عنوان المحتوى</label>
+        <input type="text" id="content-title" />
+      </div>
+      <div class="form-group"><label>رابط المحتوى</label>
+        <input type="text" id="content-url" />
+      </div>
+      <div class="form-group"><label>مدة الفيديو (اختياري)</label>
+        <input type="text" id="content-duration" placeholder="مثال: 10:30" />
+      </div>
+      <button class="action active-btn" onclick="submitContent()">📤 نشر المحتوى</button>
     </section>
 
-    <section id="announce" style="display:none;">
-      <h2>إضافة إعلان</h2>
-      <select id="ann-stage">
-        <option value="grade4">الصف الرابع</option>
-        <option value="grade5">الصف الخامس</option>
-        <option value="grade6">الصف السادس</option>
-        <option value="prep1">الصف الأول الإعدادي</option>
-        <option value="prep2">الصف الثاني الإعدادي</option>
-        <option value="prep3">الصف الثالث الإعدادي</option>
-      </select>
-      <textarea id="ann-text" rows="3" placeholder="نص الإعلان..."></textarea>
-      <button class="action active-btn" onclick="addAnnouncement()">نشر الإعلان</button>
+    <!-- قسم الإعلانات -->
+    <section id="announce">
+      <h2>نشر إعلان</h2>
+      <div class="form-group"><label>المرحلة المستهدفة</label>
+        <select id="ann-stage">
+          <option value="grade4">الصف الرابع</option>
+          <option value="grade5">الصف الخامس</option>
+          <option value="grade6">الصف السادس</option>
+          <option value="prep1">الأول الإعدادي</option>
+          <option value="prep2">الثاني الإعدادي</option>
+          <option value="prep3">الثالث الإعدادي</option>
+        </select>
+      </div>
+      <div class="form-group"><label>نص الإعلان</label>
+        <textarea id="ann-text" rows="3"></textarea>
+      </div>
+      <button class="action active-btn" onclick="addAnnouncement()">📣 نشر</button>
     </section>
-  </main>
+
+    <!-- قسم الإحصائيات -->
+    <section id="stats">
+      <h2>إحصائيات المنصة</h2>
+      <p>📌 عدد الطلاب: <span id="total-students">0</span></p>
+      <p>✅ مفعلين: <span id="active-subscribers">0</span></p>
+      <p>📢 إعلان حالي: <span id="current-ann">-</span></p>
+    </section>
+  </div>
 </div>
 
 <script>
@@ -172,83 +164,104 @@
   const db = firebase.database();
 
   function checkPassword() {
-    const pass = document.getElementById('admin-pass').value;
-    if (pass === "islamemad01122104598") {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'flex';
+    const pass = document.getElementById('admin-pass').value.trim();
+    if (pass === "islamemad01122104596") {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
       showSection('students');
-      loadStudents();
-      loadStats();
+      loadStudents(); loadStats();
     } else {
-      document.getElementById('pass-error').innerText = 'كلمة المرور غير صحيحة';
+      document.getElementById("pass-error").innerText = "كلمة المرور غير صحيحة.";
     }
   }
 
   function showSection(id) {
-    ['students', 'stats', 'announce'].forEach(sec => {
+    ['students','content','announce','stats'].forEach(sec => {
       document.getElementById(sec).style.display = sec === id ? 'block' : 'none';
     });
   }
 
   function loadStudents() {
-    const tbody = document.getElementById('students-body');
+    const tbody = document.getElementById("students-body");
     tbody.innerHTML = '';
-    db.ref('users/students').once('value').then(snapshot => {
-      const data = snapshot.val() || {};
-      Object.entries(data).forEach(([phone, user]) => {
-        const row = `
-          <tr>
-            <td>${phone}</td>
-            <td>${user.name}</td>
-            <td>${user.stage}</td>
-            <td>${user.governorate}</td>
-            <td>${user.subscription?.active ? '✅' : '❌'}</td>
-            <td>
-              <button class="action ${user.subscription?.active ? 'inactive-btn' : 'active-btn'}"
-                onclick="toggleSub('${phone}', ${user.subscription?.active})">
-                ${user.subscription?.active ? 'إلغاء' : 'تفعيل'}
-              </button>
-              <button class="action delete-btn" onclick="deleteUser('${phone}')">حذف</button>
-            </td>
-          </tr>`;
-        tbody.innerHTML += row;
+    db.ref('users/students').once("value", snap => {
+      const data = snap.val() || {};
+      Object.entries(data).forEach(([phone, student]) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${phone}</td>
+          <td>${student.name}</td>
+          <td>${student.stage}</td>
+          <td>${student.governorate}</td>
+          <td>${student.subscription?.active ? "✅" : "❌"}</td>
+          <td>
+            <button class="action ${student.subscription?.active ? 'inactive-btn':'active-btn'}"
+              onclick="toggleSubscription('${phone}', ${student.subscription?.active})">
+              ${student.subscription?.active ? "إلغاء" : "تفعيل"}
+            </button>
+            <button class="action delete-btn" onclick="deleteStudent('${phone}')">🗑️ حذف</button>
+          </td>`;
+        tbody.appendChild(row);
       });
     });
   }
 
-  function toggleSub(phone, active) {
-    db.ref(`users/students/${phone}/subscription/active`).set(!active).then(loadStudents);
+  function toggleSubscription(phone, currentState) {
+    db.ref(`users/students/${phone}/subscription/active`).set(!currentState).then(loadStudents);
   }
 
-  function deleteUser(phone) {
-    if (confirm("هل تريد حذف هذا الطالب نهائيًا؟")) {
+  function deleteStudent(phone) {
+    if (confirm("هل تريد حذف الطالب؟")) {
       db.ref(`users/students/${phone}`).remove().then(loadStudents);
     }
   }
 
   function loadStats() {
-    db.ref('users/students').once('value').then(snapshot => {
-      const data = snapshot.val() || {};
-      document.getElementById('total-students').innerText = Object.keys(data).length;
-      document.getElementById('active-subscribers').innerText = Object.values(data).filter(u => u.subscription?.active).length;
+    db.ref("users/students").once("value", snap => {
+      const users = snap.val() || {};
+      document.getElementById("total-students").innerText = Object.keys(users).length;
+      document.getElementById("active-subscribers").innerText =
+        Object.values(users).filter(u => u.subscription?.active).length;
+    });
+    db.ref("settings/currentAnnouncement").once("value", snap => {
+      const val = snap.val();
+      document.getElementById("current-ann").innerText = (val?.display ? val.text : "-");
     });
   }
 
   function addAnnouncement() {
-    const stage = document.getElementById('ann-stage').value;
-    const message = document.getElementById('ann-text').value.trim();
-    if (!message) return alert('أدخل نص الإعلان أولاً');
-    const id = 'notif' + Date.now();
+    const stage = document.getElementById("ann-stage").value;
+    const text = document.getElementById("ann-text").value.trim();
+    if (!text) return alert("⚠️ أكتب نص الإعلان أولاً");
+    const id = "notif_" + Date.now();
     db.ref(`notifications/${stage}/${id}`).set({
-      message,
+      message: text,
       scheduledAt: new Date().toISOString(),
       repeat: "NONE"
     }).then(() => {
-      alert("تم نشر الإعلان");
-      document.getElementById('ann-text').value = '';
+      alert("✅ تم نشر الإعلان");
+      document.getElementById("ann-text").value = '';
+    });
+  }
+
+  function submitContent() {
+    const stage = document.getElementById("content-stage").value;
+    const type = document.getElementById("content-type").value;
+    const title = document.getElementById("content-title").value.trim();
+    const url = document.getElementById("content-url").value.trim();
+    const duration = document.getElementById("content-duration").value.trim();
+    if (!title || !url) return alert("يرجى ملء كل الحقول المطلوبة");
+
+    const contentId = "content_" + Date.now();
+    db.ref(`content/${stage}/${contentId}`).set({
+      type, title, url, duration, createdAt: new Date().toISOString()
+    }).then(() => {
+      alert("✅ تم نشر المحتوى");
+      document.getElementById("content-title").value = '';
+      document.getElementById("content-url").value = '';
+      document.getElementById("content-duration").value = '';
     });
   }
 </script>
-
 </body>
 </html>
