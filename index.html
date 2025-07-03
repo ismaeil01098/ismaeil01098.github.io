@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة مادة العلوم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(to bottom, #1c1c1c, #2e2e2e);
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .title {
+      font-family: 'Scheherazade New', serif;
+      font-size: 2.2rem;
+      color: #ffd700;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in-out forwards;
+    }
+
+    .ayah {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #ccc;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeIn 2s 1s ease-in-out forwards;
+    }
+
+    .enter-btn {
+      padding: 0.9rem 2.5rem;
+      font-size: 1rem;
+      background: #b6a564;
+      border: none;
+      border-radius: 25px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 2s 2s ease-in-out forwards;
+    }
+
+    .enter-btn:hover {
+      background: #a58f4f;
+      transform: scale(1.05);
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 0.85rem;
+      color: #888;
+      opacity: 0.8;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+  </style>
+  </head>
+<body>
+  <div class="title">منصة مادة العلوم</div>
+
+  <div class="ayah">
+    ﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾<br>
+    <span style="font-size: 0.85rem; color: #999;">[طه: 114]</span>
+  </div>
+
+  <button class="enter-btn" onclick="enterPlatform()">دخول المنصة</button>
+
+  <div class="footer">
+    برمجة وتدريس: أ. إسماعيل عماد – 01122104596
+  </div>
+
+  <audio id="welcomeAudio" src="welcome.mp3"></audio>
+  <script>
+    function enterPlatform() {
+      const audio = document.getElementById("welcomeAudio");
+      document.querySelector(".enter-btn").innerText = "...جاري الدخول";
+      audio.play();
+
+      audio.onended = () => {
+        window.location.href = "access.html";
+      };
+
+      // في حالة الصوت لا يعمل أو المتصفح يمنعه بعد 6 ثوانٍ
+      setTimeout(() => {
+        if (!audio.paused) return;
+        window.location.href = "access.html";
+      }, 6000);
+    }
+  </script>
+</body>
+</html>
