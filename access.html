@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دخول أو تسجيل جديد</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #2c2c2c, #3f3f3f);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+      animation: fadeIn 1.5s ease;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #ffdd57;
+    }
+
+    .btn {
+      display: block;
+      width: 240px;
+      margin: 0.8rem auto;
+      padding: 0.9rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 30px;
+      background-color: #ffdd57;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #f4c21e;
+      transform: scale(1.05);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>مرحباً بك في منصة مادة العلوم</h1>
+    <button class="btn" onclick="goToLogin()">تسجيل دخول؟</button>
+    <button class="btn" onclick="goToRegister()">إنشاء حساب لو أول مرة</button>
+  </div>
+
+  <footer>
+    برمجة وتصميم: أ. إسماعيل عماد – 01122104596
+  </footer>
+
+  <script>
+    function goToLogin() {
+      window.location.href = "login.html";
+    }
+
+    function goToRegister() {
+      window.location.href = "register.html";
+    }
+  </script>
+</body>
+</html>
