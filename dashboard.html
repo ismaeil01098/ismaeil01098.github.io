@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم - منصة العلوم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body { margin: 0; font-family: 'Tajawal', sans-serif; background: #f9f9f9; color: #333; }
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); display: flex;
+      align-items: center; justify-content: center; z-index: 999;
+    }
+    .password-box {
+      background: #fff; padding: 1.5rem; border-radius: 10px;
+      width: 90%; max-width: 320px; text-align: center;
+      box-shadow: 0 0 12px rgba(0,0,0,0.3);
+    }
+    .password-box input {
+      width: 100%; padding: 0.7rem; font-size: 1rem;
+      margin-top: 0.7rem; border-radius: 6px; border: 1px solid #ccc;
+    }
+    .password-box button {
+      margin-top: 1rem; padding: 0.7rem 1.5rem;
+      background: #b6a564; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-size: 1rem;
+    }
+
+    .container { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 60px; background: #222; color: #fff; transition: width 0.3s;
+    }
+    .sidebar.expanded { width: 200px; }
+    .sidebar .toggle {
+      padding: 1rem; cursor: pointer; text-align: center;
+      background: #111; font-size: 1.2rem;
+    }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li {
+      padding: 0.9rem 1rem; cursor: pointer; display: flex; align-items: center;
+    }
+    .sidebar li:hover { background: #333; }
+    .sidebar li span.text { margin-right: 0.6rem; opacity: 0; transition: 0.3s; }
+    .sidebar.expanded li span.text { opacity: 1; }
+
+    .main { flex: 1; padding: 1rem; overflow-y: auto; }
+
+    h2 { margin-top: 0; font-size: 1.3rem; color: #333; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    th, td {
+      border: 1px solid #ccc; padding: 0.6rem;
+      font-size: 0.9rem; text-align: center;
+    }
+    th { background: #b6a564; color: white; }
+
+    button.action {
+      padding: 0.4rem 0.7rem; font-size: 0.8rem;
+      margin: 0 0.2rem; border: none; border-radius: 5px;
+      cursor: pointer;
+    }
+    .active-btn { background: #3ab54a; color: white; }
+    .inactive-btn { background: #ec5353; color: white; }
+    .delete-btn { background: #555; color: white; }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block; margin-bottom: 0.3rem; font-weight: bold;
+    }
+    .form-group textarea, .form-group select {
+      width: 100%; padding: 0.6rem; border-radius: 5px; border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .sidebar { display: none; }
+      .container { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- شاشة كلمة المرور -->
+<div class="overlay" id="overlay">
+  <div class="password-box">
+    <h3>أدخل كلمة المرور</h3>
+    <input type="password" id="admin-pass" />
+    <button onclick="checkPassword()">دخول</button>
+    <div id="pass-error" style="margin-top:0.5rem; color:red;"></div>
+  </div>
+</div>
+
+<!-- لوحة التحكم -->
+<div class="container" id="dashboard" style="display:none;">
+  <!-- الشريط الجانبي -->
+  <div class="sidebar" id="sidebar">
+    <div class="toggle" onclick="toggleSidebar()">☰</div>
+    <ul>
+      <li onclick="showSection('students')"><span class="text">👥 الطلاب</span></li>
+      <li onclick="showSection('stats')"><span class="text">📊 الإحصائيات</span></li>
+      <li onclick="showSection('announce')"><span class="text">🔔 الإعلانات</span></li>
+    </ul>
+  </div>
+
+  <!-- الصفحة الرئيسية -->
+  <div class="main">
+    <!-- قسم الطلاب -->
+    <section id="students">
+      <h2>قائمة الطلاب</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>الهاتف</th>
+            <th>الاسم</th>
+            <th>المرحلة</th>
+            <th>المحافظة</th>
+            <th>مفعل؟</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="students-body"></tbody>
+      </table>
+    </section>
+
+    <!-- قسم الإحصائيات -->
+    <section id="stats" style="display:none;">
+      <h2>إحصائيات المنصة</h2>
+      <p>عدد الطلاب: <span id="total-students">0</span></p>
+      <p>عدد المفعلين: <span id="active-students">0</span></p>
+    </section>
+
+    <!-- قسم الإعلانات -->
+    <section id="announce" style="display:none;">
+      <h2>إرسال إعلان</h2>
+      <div class="form-group">
+        <label>اختر المرحلة</label>
+        <select id="ann-stage">
+          <option value="grade4">الصف الرابع</option>
+          <option value="grade5">الصف الخامس</option>
+          <option value="grade6">الصف السادس</option>
+          <option value="prep1">الأول الإعدادي</option>
+          <option value="prep2">الثاني الإعدادي</option>
+          <option value="prep3">الثالث الإعدادي</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>نص الإعلان</label>
+        <textarea id="ann-text" rows="3" placeholder="نص الإعلان..."></textarea>
+      </div>
+      <button class="action active-btn" onclick="sendAnn()">نشر</button>
+    </section>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQ71OtMZ3jvoSgziKsyxB1XUKhz9WFRSA",
+    authDomain: "monasat-oloum.firebaseapp.com",
+    databaseURL: "https://monasat-oloum-default-rtdb.firebaseio.com",
+    projectId: "monasat-oloum",
+    storageBucket: "monasat-oloum.appspot.com",
+    messagingSenderId: "500281750476",
+    appId: "1:500281750476:web:67aa4bf47d5744dc5f6369"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function checkPassword(){
+    const p = document.getElementById("admin-pass").value.trim();
+    if(p === "islamemad01122104598"){
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("dashboard").style.display = "flex";
+      showSection('students');
+      loadStudents();
+    } else {
+      document.getElementById("pass-error").innerText = "كلمة المرور خاطئة";
+    }
+  }
+
+  function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("expanded");
+  }
+
+  function showSection(id){
+    ['students','stats','announce'].forEach(sec=>{
+      document.getElementById(sec).style.display = (sec === id) ? 'block' : 'none';
+    });
+    if(id==='stats') loadStats();
+  }
+
+  function loadStudents(){
+    const tbody = document.getElementById("students-body");
+    tbody.innerHTML = '';
+    db.ref("users/students").once("value").then(snap=>{
+      const data = snap.val() || {};
+      Object.entries(data).forEach(([phone, stu])=>{
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${phone}</td>
+          <td>${stu.name}</td>
+          <td>${stu.stage}</td>
+          <td>${stu.governorate}</td>
+          <td>${stu.subscription?.active ? "✅" : "❌"}</td>
+          <td>
+            <button class="action ${stu.subscription?.active ? 'inactive-btn' : 'active-btn'}"
+              onclick="toggleActivation('${phone}', ${stu.subscription?.active})">
+              ${stu.subscription?.active ? 'إلغاء' : 'تفعيل'}
+            </button>
+            <button class="action delete-btn" onclick="deleteStudent('${phone}')">حذف</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+  }
+
+  function toggleActivation(phone, current){
+    db.ref(`users/students/${phone}/subscription/active`).set(!current).then(loadStudents);
+  }
+
+  function deleteStudent(phone){
+    if(confirm("هل أنت متأكد من الحذف؟")){
+      db.ref(`users/students/${phone}`).remove().then(loadStudents);
+    }
+  }
+
+  function loadStats(){
+    db.ref("users/students").once("value").then(snap=>{
+      const data = snap.val() || {};
+      document.getElementById("total-students").innerText = Object.keys(data).length;
+      document.getElementById("active-students").innerText = Object.values(data).filter(s=>s.subscription?.active).length;
+    });
+  }
+
+  function sendAnn(){
+    const stage = document.getElementById("ann-stage").value;
+    const msg = document.getElementById("ann-text").value.trim();
+    if(!msg) return alert("اكتب نص الإعلان");
+    const id = 'notif'+Date.now();
+    db.ref(`notifications/${stage}/${id}`).set({
+      message: msg,
+      scheduledAt: new Date().toISOString(),
+      repeat: "NONE"
+    }).then(()=>{
+      alert("✅ تم نشر الإعلان");
+      document.getElementById("ann-text").value = "";
+    });
+  }
+</script>
+
+</body>
+</html>
