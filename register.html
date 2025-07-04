@@ -80,7 +80,6 @@
   </style>
 </head>
 <body>
-
   <div class="container">
     <h2>إنشاء حساب جديد</h2>
     <form id="registerForm">
@@ -107,6 +106,7 @@
         <input type="password" id="confirm" required>
         <div class="error" id="error-confirm"></div>
       </div>
+
       <div class="form-group">
         <label for="stage">المرحلة الدراسية</label>
         <select id="stage" required>
@@ -165,10 +165,9 @@
       <button type="submit" class="btn">إنشاء الحساب</button>
     </form>
   </div>
-
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
@@ -182,12 +181,13 @@
     messagingSenderId: "22539678455",
     appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
   document.getElementById("registerForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    
+
     // القيم
     const name = document.getElementById("name").value.trim();
     const phone = document.getElementById("phone").value.trim();
@@ -253,8 +253,6 @@
       .then((userCredential) => {
         if (!userCredential) return;
 
-        const user = userCredential.user;
-
         const studentData = {
           الاسم: name,
           كلمة_السر: password,
@@ -265,13 +263,14 @@
           اشتراك_مفعل: false
         };
 
-return db.ref("users/students/" + phone).set(studentData)
+        return db.ref("users/students/" + phone).set(studentData)
           .then(() => {
             alert("✅ تم إنشاء الحساب بنجاح!");
             window.location.href = "payment.html";
-          })
-          .catch((err) => {
-            alert("❌ حدث خطأ أثناء التسجيل: " + err.message);
           });
+      })
+      .catch((err) => {
+        alert("❌ حدث خطأ أثناء التسجيل: " + err.message);
       });
-    </script>
+  });
+</script>
