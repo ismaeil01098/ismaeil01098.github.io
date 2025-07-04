@@ -111,16 +111,15 @@
       right: 10px;
       font-size: 1.6rem;
       color: #e74c3c;
+    }
+    .menu-item.unlocked .lock-icon {
       display: none;
     }
-    .menu-item[data-locked] .lock-icon {
-      display: block;
-    }
-    .menu-item[data-locked] {
+    .menu-item.locked {
       opacity: 0.7;
       filter: grayscale(70%);
     }
-    .menu-item[data-locked]:hover {
+    .menu-item.locked:hover {
       cursor: not-allowed;
       transform: none;
       border-color: #333;
@@ -210,33 +209,35 @@
   
   <!-- قائمة الخيارات -->
   <div class="menu-grid">
-    <div class="menu-item" data-locked id="btn-book">
+    <div class="menu-item locked" id="btn-book">
       <span>📚</span>
       <p>الكتاب المدرسي</p>
       <div class="lock-icon">🔒</div>
     </div>
-    <div class="menu-item" data-locked id="btn-videos">
+    <div class="menu-item locked" id="btn-videos">
       <span>🎥</span>
       <p>فيديوهات الشرح</p>
       <div class="lock-icon">🔒</div>
     </div>
-    <div class="menu-item" data-locked id="btn-notes">
+    <div class="menu-item locked" id="btn-notes">
       <span>📝</span>
       <p>الملازم المكتوبة</p>
       <div class="lock-icon">🔒</div>
     </div>
-    <div class="menu-item" data-locked id="btn-exams">
+    <div class="menu-item locked" id="btn-exams">
       <span>🧪</span>
       <p>الامتحانات</p>
       <div class="lock-icon">🔒</div>
     </div>
-    <div class="menu-item" id="btn-special">
+    <div class="menu-item unlocked" id="btn-special">
       <span>♿</span>
       <p>ذوي الاحتياجات الخاصة</p>
+      <div class="lock-icon">🔒</div>
     </div>
-    <div class="menu-item" id="btn-about">
+    <div class="menu-item unlocked" id="btn-about">
       <span>👨‍🏫</span>
       <p>عن الأستاذ إسماعيل</p>
+      <div class="lock-icon">🔒</div>
     </div>
   </div>
   
@@ -306,6 +307,7 @@
         const name = data["الاسم"] || "طالب";
         const regDateStr = data["مسجل_في"];
         const isActive = data["اشتراك_مفعل"] === true;
+        let remaining = 0;
 
         // عرض معلومات الطالب
         document.getElementById("studentName").innerText = `👤 الاسم: ${name}`;
@@ -316,7 +318,7 @@
           
           // حساب الأيام المتبقية من تاريخ التسجيل (30 يومًا)
           const daysPassed = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
-          const remaining = Math.max(0, 30 - daysPassed);
+          remaining = Math.max(0, 30 - daysPassed);
           
           document.getElementById("regDate").innerText = `🕓 مسجل منذ: ${regDate.toLocaleDateString('ar-EG')}`;
           document.getElementById("remainingDays").innerText = `⏳ تبقّى من الاشتراك: ${remaining} يوم`;
@@ -330,11 +332,12 @@
           }
         }
 
-        // إزالة الأقفال إذا كان الحساب مفعلاً
+        // إزالة الأقفال إذا كان الحساب مفعلاً ولم ينتهي الاشتراك
         if (isActive && remaining > 0) {
-          document.querySelectorAll('.menu-item[data-locked]').forEach(item => {
-            item.removeAttribute('data-locked');
-            item.querySelector('.lock-icon').style.display = 'none';
+          // إزالة القفل من جميع الأزرار
+          document.querySelectorAll('.menu-item.locked').forEach(item => {
+            item.classList.remove('locked');
+            item.classList.add('unlocked');
             
             // إضافة وظائف للأزرار
             if (item.id === 'btn-book') item.onclick = () => location.href = 'book.html';
@@ -344,9 +347,15 @@
           });
         } else {
           // إظهار رسالة للأزرار المؤمنة
-          document.querySelectorAll('.menu-item[data-locked]').forEach(item => {
+          document.querySelectorAll('.menu-item.locked').forEach(item => {
             item.onclick = () => {
-              showToast('⛔ هذه الميزة متاحة فقط للأعضاء المشتركين');
+              if (remaining <= 0) {
+                showToast('⛔ انتهى اشتراكك! يرجى تجديد الاشتراك');
+              } else if (!isActive) {
+                showToast('⛔ الحساب غير مفعل! يرجى إتمام عملية الدفع');
+              } else {
+                showToast('⛔ هذه الميزة غير متاحة حالياً');
+              }
             };
           });
         }
@@ -368,12 +377,15 @@
 
     // جلب الإعلانات من قاعدة البيانات
     function loadAnnouncements() {
-      db.ref("announcements/grade4").once("value").then(snapshot => {
+      db.ref("announcements").once("value").then(snapshot => {
         const announcements = snapshot.val();
-        if (announcements && announcements.length > 0) {
-          const announcementText = announcements.join(' • ');
+        if (announcements && announcements.grade4) {
+          const announcementText = announcements.grade4.join(' • ');
           document.getElementById("announcement").innerText = announcementText;
         }
+      }).catch(error => {
+        console.error("حدث خطأ في جلب الإعلانات:", error);
+        document.getElementById("announcement").innerText = "مرحباً بطلاب الصف الرابع! يمكنكم الآن الوصول للمحتوى التعليمي 💡";
       });
     }
 
