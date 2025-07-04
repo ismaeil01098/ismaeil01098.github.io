@@ -265,14 +265,13 @@
           اشتراك_مفعل: false
         };
 
-        return db.ref("المستخدمين/" + user.uid).set(studentData);
-      })
-      .then(() => {
-        alert("✅ تم إنشاء الحساب بنجاح!");
-        window.location.href = "payment.html";
-      })
-      .catch((err) => {
-        alert("❌ حدث خطأ أثناء التسجيل: " + err.message);
+return db.ref("users/" + user.uid).set(studentData)
+          .then(() => {
+            alert("✅ تم إنشاء الحساب بنجاح!");
+            window.location.href = "payment.html";
+          })
+          .catch((err) => {
+            alert("❌ حدث خطأ أثناء التسجيل: " + err.message);
+          });
       });
-  });
-</script>
+    </script>
