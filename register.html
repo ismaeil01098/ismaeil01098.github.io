@@ -165,7 +165,9 @@
       <button type="submit" class="btn">إنشاء الحساب</button>
     </form>
   </div>
+
   <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -200,19 +202,16 @@
 
     let valid = true;
 
-    // تحقق من الاسم (عربي فقط)
     if (!/^[\u0600-\u06FF\s]{3,}$/.test(name)) {
       document.getElementById("error-name").innerText = "❌ الاسم يجب أن يكون باللغة العربية فقط";
       valid = false;
     }
 
-    // تحقق من الرقم (11 رقم إنجليزي)
     if (!/^[0-9]{11}$/.test(phone)) {
       document.getElementById("error-phone").innerText = "❌ يجب إدخال رقم مكون من 11 رقم إنجليزي فقط";
       valid = false;
     }
 
-    // تحقق من كلمة المرور
     if (password.length < 8) {
       document.getElementById("error-password").innerText = "❌ كلمة المرور يجب أن تكون 8 أرقام على الأقل";
       valid = false;
@@ -240,28 +239,40 @@
 
     if (!valid) return;
 
-    // تسجيل المستخدم في قاعدة البيانات
-    const studentData = {
-      name: name,
-      password: password,
-      stage: stage,
-      age: age,
-      governorate: gov,
-      registeredAt: new Date().toISOString(),
-      subscription: {
-        startedAt: null,
-        expiresAt: null,
-        active: false
-      }
-    };
+    const fakeEmail = phone + "@monasat.com";
 
-    db.ref("users/students/" + phone).set(studentData).then(() => {
-      alert("✅ تم إنشاء الحساب بنجاح!");
-      window.location.href = "payment.html";
-    }).catch(err => {
-      alert("❌ حدث خطأ أثناء الحفظ: " + err.message);
-    });
+    firebase.auth().fetchSignInMethodsForEmail(fakeEmail)
+      .then((methods) => {
+        if (methods.length > 0) {
+          alert("❌ الرقم ده مسجّل قبل كده. جرّب رقم تاني.");
+          return;
+        }
+
+        return firebase.auth().createUserWithEmailAndPassword(fakeEmail, password);
+      })
+      .then((userCredential) => {
+        if (!userCredential) return;
+
+        const user = userCredential.user;
+
+        const studentData = {
+          الاسم: name,
+          كلمة_السر: password,
+          المرحلة: stage,
+          المحافظة: gov,
+          العمر: age,
+          مسجل_في: new Date().toISOString(),
+          اشتراك_مفعل: false
+        };
+
+        return db.ref("المستخدمين/" + user.uid).set(studentData);
+      })
+      .then(() => {
+        alert("✅ تم إنشاء الحساب بنجاح!");
+        window.location.href = "payment.html";
+      })
+      .catch((err) => {
+        alert("❌ حدث خطأ أثناء التسجيل: " + err.message);
+      });
   });
 </script>
-</body>
-</html>
