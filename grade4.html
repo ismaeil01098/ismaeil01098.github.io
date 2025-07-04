@@ -241,6 +241,7 @@
         if (regDateStr) {
           const regDate = new Date(regDateStr);
           const now = new Date();
+          // حساب الأيام المتبقية من تاريخ التسجيل (30 يومًا)
           const daysPassed = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
           const remaining = Math.max(0, 30 - daysPassed);
           
@@ -263,49 +264,4 @@
             
             // إضافة وظائف للأزرار
             if (item.id === 'btn-book') item.onclick = () => location.href = 'book.html';
-            if (item.id === 'btn-videos') item.onclick = () => location.href = 'videos.html';
-            if (item.id === 'btn-notes') item.onclick = () => location.href = 'notes.html';
-            if (item.id === 'btn-exams') item.onclick = () => location.href = 'exams.html';
-          });
-        } else {
-          // إضافة رسالة تفعيل للأزرار المقفلة
-          document.querySelectorAll('.menu-item[data-locked]').forEach(item => {
-            item.onclick = () => {
-              alert('⚠️ يجب تفعيل الحساب أولاً عبر الدفع');
-              location.href = 'payment.html';
-            };
-          });
-        }
-      }).catch(error => {
-        console.error('Error loading student data:', error);
-        showToast('حدث خطأ في تحميل بيانات الطالب', 3000);
-      });
-    }
-
-    // تحميل الإعلانات
-    function loadAnnouncement() {
-      db.ref("settings/announcements/grade4").once("value").then(snapshot => {
-        const ann = snapshot.val();
-        if (ann && ann.text) {
-          document.getElementById('announcement').textContent = ann.text;
-        } else {
-          document.getElementById('announcement').textContent = 'لا يوجد إعلانات حالياً';
-        }
-      }).catch(error => {
-        console.error('Error loading announcement:', error);
-        document.getElementById('announcement').textContent = 'حدث خطأ في تحميل الإعلان';
-      });
-    }
-
-    // إعداد الأزرار المفتوحة
-    document.getElementById('btn-special').onclick = () => location.href = 'special.html';
-    document.getElementById('btn-about').onclick = () => location.href = 'about.html';
-
-    // تهيئة الصفحة عند التحميل
-    document.addEventListener('DOMContentLoaded', () => {
-      loadStudentData();
-      loadAnnouncement();
-    });
-  </script>
-</body>
-</html>
+            if (item.id === 'btn-videos') item.onclick = () => location.href = 'videos.html
