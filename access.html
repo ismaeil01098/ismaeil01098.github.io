@@ -3,86 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دخول أو تسجيل جديد</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <title>بوابة الدخول - منصة العلوم التعليمية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
       font-family: 'Tajawal', sans-serif;
-      background: linear-gradient(135deg, #2c2c2c, #3f3f3f);
+      background: linear-gradient(135deg, #1a2a6c, #2c3e50);
       color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* شريط الرأس */
+    .header {
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      height: 100vh;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
     }
 
-    .container {
-      text-align: center;
-      padding: 2rem;
-      animation: fadeIn 1.5s ease;
+    .logo-icon {
+      font-size: 2.5rem;
+      color: #ffdd57;
     }
 
-    h1 {
+    .logo-text {
       font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .tagline {
+      font-size: 1.1rem;
+      color: #f1c40f;
+      margin-top: 0.5rem;
+    }
+
+    /* القسم الرئيسي */
+    .access-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .access-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3') no-repeat center center;
+      background-size: cover;
+      opacity: 0.15;
+      z-index: -1;
+    }
+
+    .access-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .access-title {
+      font-size: 2.5rem;
       margin-bottom: 2rem;
       color: #ffdd57;
     }
 
-    .btn {
-      display: block;
-      width: 240px;
-      margin: 0.8rem auto;
-      padding: 0.9rem;
+    .access-description {
+      font-size: 1.4rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .access-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      background: rgba(255, 221, 87, 0.2);
+      border-radius: 20px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.4s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .access-btn:hover {
+      background: rgba(255, 221, 87, 0.3);
+      transform: translateY(-10px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-icon {
+      font-size: 3rem;
+      margin-bottom: 1.2rem;
+      color: #ffdd57;
+    }
+
+    .btn-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-desc {
       font-size: 1.1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 30px;
-      background-color: #ffdd57;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      opacity: 0.9;
     }
 
-    .btn:hover {
-      background-color: #f4c21e;
-      transform: scale(1.05);
+    /* الشريط السفلي */
+    .footer {
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      font-size: 1.1rem;
     }
 
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.85rem;
-      color: #ccc;
+    /* تأثيرات متحركة */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .floating {
+      animation: float 5s ease-in-out infinite;
+    }
+
+    /* تصميم متجاوب */
+    @media (max-width: 768px) {
+      .buttons-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .access-title {
+        font-size: 2rem;
+      }
+      
+      .access-description {
+        font-size: 1.2rem;
+      }
+      
+      .access-box {
+        padding: 2rem 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>مرحباً بك في منصة مادة العلوم</h1>
-    <button class="btn" onclick="goToLogin()">تسجيل دخول؟</button>
-    <button class="btn" onclick="goToRegister()">إنشاء حساب لو أول مرة</button>
+  <!-- شريط الرأس -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-atom"></i>
+      </div>
+      <div class="logo-text">منصة العلوم التعليمية</div>
+    </div>
+    <div class="tagline">بوابة الدخول إلى عالم العلوم الممتع</div>
   </div>
 
-  <footer>
+  <!-- القسم الرئيسي -->
+  <div class="access-container">
+    <div class="access-box floating">
+      <h1 class="access-title">مرحباً بعودة طلابنا الأعزاء!</h1>
+      <p class="access-description">
+        سجل دخولك الآن للوصول إلى محتوى العلوم المميز لمرحلتك الدراسية،
+        أو أنشئ حساباً جديداً إذا كنت تستخدم المنصة لأول مرة
+      </p>
+      
+      <div class="buttons-grid">
+        <a href="login.html" class="access-btn">
+          <div class="btn-icon">
+            <i class="fas fa-sign-in-alt"></i>
+          </div>
+          <div class="btn-text">تسجيل الدخول</div>
+          <div class="btn-desc">لديك حساب بالفعل</div>
+        </a>
+        
+        <a href="register.html" class="access-btn">
+          <div class="btn-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="btn-text">إنشاء حساب</div>
+          <div class="btn-desc">مستخدم جديد</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- الشريط السفلي -->
+  <div class="footer">
     برمجة وتصميم: أ. إسماعيل عماد – 01122104596
-  </footer>
+  </div>
 
   <script>
-    function goToLogin() {
-      window.location.href = "login.html";
-    }
-
-    function goToRegister() {
-      window.location.href = "register.html";
-    }
+    // تأثيرات عند التحميل
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.access-btn');
+      
+      setTimeout(() => {
+        buttons.forEach((btn, index) => {
+          setTimeout(() => {
+            btn.style.opacity = '1';
+            btn.style.transform = 'translateY(0)';
+          }, 300 * index);
+        });
+      }, 500);
+    });
   </script>
 </body>
 </html>
