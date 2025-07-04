@@ -1,1 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>الصف الرابع – منصة العلوم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+    }
+    .topbar {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .announcement-bar {
+      background: #b6a564;
+      color: #000;
+      padding: 0.5rem 1rem;
+      overflow: hidden;
+      white-space: nowrap;
+      font-weight: bold;
+      font-size: 1rem;
+      position: relative;
+    }
+    .announcement-text {
+      display: inline-block;
+      animation: scrollText 20s linear infinite;
+    }
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .student-info {
+      padding: 1rem;
+      background: #2b2b2b;
+      text-align: center;
+      border-bottom: 2px solid #444;
+      font-size: 0.95rem;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+    .menu-item {
+      background: #1f1f1f;
+      color: #fff;
+      padding: 1.2rem;
+      border-radius: 20px;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .menu-item:hover {
+      transform: translateY(-5px);
+      background: #333;
+    }
+    .menu-item span {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .menu-item p {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .lock-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.4rem;
+      color: #e74c3c;
+      display: none;
+    }
+    .menu-item[data-locked] .lock-icon {
+      display: block;
+    }
+    .menu-item[data-locked] {
+      opacity: 0.6;
+    }
+    .logout-btn {
+      display: block;
+      width: 150px;
+      margin: 1rem auto;
+      padding: 0.7rem 1.2rem;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      display: none;
+      font-size: 0.95rem;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <!-- الشريط العلوي -->
+  <div class="topbar">💡 منصة العلوم – الصف الرابع الابتدائي</div>
+  
+  <!-- شريط الإعلانات -->
+  <div class="announcement-bar">
+    <div id="announcement" class="announcement-text">جارٍ تحميل الإعلان...</div>
+  </div>
+  
+  <!-- معلومات الطالب -->
+  <div class="student-info">
+    <div id="studentName">👤 الاسم: ...</div>
+    <span id="regDate">🕓 مسجل منذ: ...</span>
+    <span id="remainingDays">⏳ تبقّى من الاشتراك: ... يوم</span>
+  </div>
+  
+  <!-- قائمة الخيارات -->
+  <div class="menu-grid">
+    <div class="menu-item" data-locked id="btn-book">
+      <span>📚</span>
+      <p>الكتاب المدرسي</p>
+      <div class="lock-icon">🔒</div>
+    </div>
+    <div class="menu-item" data-locked id="btn-videos">
+      <span>🎥</span>
+      <p>فيديوهات الشرح</p>
+      <div class="lock-icon">🔒</div>
+    </div>
+    <div class="menu-item" data-locked id="btn-notes">
+      <span>📝</span>
+      <p>الملازم المكتوبة</p>
+      <div class="lock-icon">🔒</div>
+    </div>
+    <div class="menu-item" data-locked id="btn-exams">
+      <span>🧪</span>
+      <p>الامتحانات</p>
+      <div class="lock-icon">🔒</div>
+    </div>
+    <div class="menu-item" id="btn-special">
+      <span>♿</span>
+      <p>ذوي الاحتياجات الخاصة</p>
+    </div>
+    <div class="menu-item" id="btn-about">
+      <span>👨‍🏫</span>
+      <p>عن الأستاذ إسماعيل</p>
+    </div>
+  </div>
+  
+  <!-- زر تسجيل الخروج -->
+  <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+  
+  <!-- إشعار منبثق -->
+  <div id="toast"></div>
 
+  <script>
+    // إعدادات Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
+      authDomain: "manssat-science.firebaseapp.com",
+      databaseURL: "https://manssat-science-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "manssat-science",
+      storageBucket: "manssat-science.appspot.com",
+      messagingSenderId: "22539678455",
+      appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
+    };
+
+    // تهيئة التطبيق
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // التحقق من تسجيل الدخول
+    const phone = localStorage.getItem('studentPhone');
+    if (!phone) {
+      alert("🚫 يجب تسجيل الدخول أولاً");
+      location.href = "login.html";
+    }
+
+    // ✅ إظهار إشعار
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, duration);
+    }
+
+    // ✅ تسجيل خروج
+    function logout() {
+      localStorage.removeItem('studentPhone');
+      showToast('تم تسجيل الخروج بنجاح ✅');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1500);
+    }
+
+    // جلب بيانات الطالب
+    function loadStudentData() {
+      db.ref("users/students/" + phone).once("value").then(snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          alert("🚫 لا يوجد حساب بهذا الرقم");
+          location.href = "login.html";
+          return;
+        }
+
+        const name = data["الاسم"] || "طالب";
+        const regDateStr = data["مسجل_في"];
+        const isActive = data["اشتراك_مفعل"];
+
+        // عرض معلومات الطالب
+        document.getElementById("studentName").innerText = `👤 الاسم: ${name}`;
+        
+        if (regDateStr) {
+          const regDate = new Date(regDateStr);
+          const now = new Date();
+          const daysPassed = Math.floor((now - regDate) / (1000 * 60 * 60 * 24));
+          const remaining = Math.max(0, 30 - daysPassed);
+          
+          document.getElementById("regDate").innerText = `🕓 مسجل منذ: ${regDate.toLocaleDateString('ar-EG')}`;
+          document.getElementById("remainingDays").innerText = `⏳ تبقّى من الاشتراك: ${remaining} يوم`;
+          
+          // تحذير إذا قلّت الأيام
+          if (remaining <= 5 && remaining > 0) {
+            showToast(`⚠️ باقي فقط ${remaining} يوم على انتهاء الاشتراك!`);
+          } else if (remaining <= 0) {
+            showToast("⛔ انتهى اشتراكك! يرجى التجديد");
+          }
+        }
+
+        // إزالة الأقفال إذا كان الحساب مفعلاً
+        if (isActive) {
+          document.querySelectorAll('.menu-item[data-locked]').forEach(item => {
+            item.removeAttribute('data-locked');
+            item.querySelector('.lock-icon').style.display = 'none';
+            
+            // إضافة وظائف للأزرار
+            if (item.id === 'btn-book') item.onclick = () => location.href = 'book.html';
+            if (item.id === 'btn-videos') item.onclick = () => location.href = 'videos.html';
+            if (item.id === 'btn-notes') item.onclick = () => location.href = 'notes.html';
+            if (item.id === 'btn-exams') item.onclick = () => location.href = 'exams.html';
+          });
+        } else {
+          // إضافة رسالة تفعيل للأزرار المقفلة
+          document.querySelectorAll('.menu-item[data-locked]').forEach(item => {
+            item.onclick = () => {
+              alert('⚠️ يجب تفعيل الحساب أولاً عبر الدفع');
+              location.href = 'payment.html';
+            };
+          });
+        }
+      }).catch(error => {
+        console.error('Error loading student data:', error);
+        showToast('حدث خطأ في تحميل بيانات الطالب', 3000);
+      });
+    }
+
+    // تحميل الإعلانات
+    function loadAnnouncement() {
+      db.ref("settings/announcements/grade4").once("value").then(snapshot => {
+        const ann = snapshot.val();
+        if (ann && ann.text) {
+          document.getElementById('announcement').textContent = ann.text;
+        } else {
+          document.getElementById('announcement').textContent = 'لا يوجد إعلانات حالياً';
+        }
+      }).catch(error => {
+        console.error('Error loading announcement:', error);
+        document.getElementById('announcement').textContent = 'حدث خطأ في تحميل الإعلان';
+      });
+    }
+
+    // إعداد الأزرار المفتوحة
+    document.getElementById('btn-special').onclick = () => location.href = 'special.html';
+    document.getElementById('btn-about').onclick = () => location.href = 'about.html';
+
+    // تهيئة الصفحة عند التحميل
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStudentData();
+      loadAnnouncement();
+    });
+  </script>
+</body>
+</html>
