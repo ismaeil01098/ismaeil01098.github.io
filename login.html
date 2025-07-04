@@ -128,6 +128,8 @@
       if (!user) {
         // الحساب غير موجود
         showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
+        // حفظ رقم الهاتف في localStorage للاستخدام في صفحة التسجيل
+        localStorage.setItem('studentPhone', phone);
         setTimeout(() => window.location.href = "register.html", 2000);
         return;
       }
@@ -139,6 +141,8 @@
 
       if (!user["اشتراك_مفعل"]) {
         showMessage("⏳ الحساب غير مفعل. سيتم توجيهك للدفع...");
+        // حفظ رقم الهاتف في localStorage للاستخدام في صفحة الدفع
+        localStorage.setItem('studentPhone', phone);
         setTimeout(() => window.location.href = "payment.html", 2000);
         return;
       }
@@ -148,6 +152,9 @@
         showMessage("⚠️ لم يتم تحديد المرحلة الدراسية.");
         return;
       }
+
+      // حفظ رقم الهاتف في localStorage للاستخدام في الصفحات الأخرى
+      localStorage.setItem('studentPhone', phone);
 
       showMessage("✅ تسجيل دخول ناجح. جارٍ التوجيه...", true);
       setTimeout(() => window.location.href = stage + ".html", 1500);
