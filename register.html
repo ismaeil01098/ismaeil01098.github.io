@@ -265,7 +265,7 @@
           اشتراك_مفعل: false
         };
 
-return db.ref("users/" + user.uid).set(studentData)
+return db.ref("users/students/" + phone).set(studentData)
           .then(() => {
             alert("✅ تم إنشاء الحساب بنجاح!");
             window.location.href = "payment.html";
