@@ -1,64 +1,138 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>لوحة التحكم – منصة العلوم</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
-    body { margin:0; font-family:'Tajawal',sans-serif; background:#f4f4f4; color:#333; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
     .overlay {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.85); display:flex;
-      align-items:center; justify-content:center; z-index:1000;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
     .password-box {
-      background:#fff; padding:1.5rem; border-radius:10px;
-      width:90%; max-width:320px; text-align:center;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
     }
     .password-box input {
-      width:100%; padding:0.7rem; margin-top:0.5rem;
-      border:1px solid #ccc; border-radius:5px;
-      font-size:1rem;
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 0.8rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
     .password-box button {
-      margin-top:1rem; padding:0.7rem 1rem;
-      background:#b6a564; color:#fff; border:none;
-      border-radius:5px; font-size:1rem; cursor:pointer;
+      margin-top: 1rem;
+      background: #b6a564;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      font-size: 1rem;
     }
-    .password-box .error { color:red; margin-top:0.6rem; }
+    .password-box .error {
+      color: red;
+      margin-top: 0.8rem;
+    }
+
     .topnav {
-      display:flex; flex-wrap:wrap; justify-content:center;
-      gap:0.6rem; background:#24221e; color:#fff;
-      padding:0.7rem 0; font-size:0.95rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      background: #24221e;
+      padding: 0.7rem 0;
+      flex-wrap: wrap;
     }
     .topnav div {
-      cursor:pointer; padding:0.4rem 1.2rem;
-      border-radius:20px; background:#b6a564; color:#fff;
-      transition:0.3s;
+      color: white;
+      background: #b6a564;
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 0.95rem;
     }
-    .topnav div.active { background:#3ab54a; }
-    .main { padding:1rem; max-width:1000px; margin:auto; }
-    section { display:none; margin-top:1.5rem; }
-    section.active { display:block; }
-    table { width:100%; border-collapse:collapse; font-size:0.9rem; margin-top:0.5rem; }
-    th, td { padding:0.5rem; border:1px solid #ccc; text-align:center; }
-    th { background:#b6a564; color:#fff; }
-    .action { padding:0.4rem 0.7rem; font-size:0.8rem;
-      border:none; border-radius:4px; cursor:pointer; margin:0 0.2rem;}
-    .active-btn { background:#3ab54a; color:#fff; }
-    .inactive-btn { background:#ec5353; color:#fff; }
-    .delete-btn { background:#777; color:#fff; }
-    .form-group { margin-bottom:1rem; }
-    .form-group label { display:block; margin-bottom:0.4rem; }
-    .form-group input, .form-group textarea, .form-group select {
-      width:100%; padding:0.5rem; border-radius:5px; border:1px solid #ccc;
+    .topnav div.active {
+      background: #3ab54a;
     }
-    .loader { text-align:center; margin:1rem 0; color:#888; }
-    canvas { max-width:600px; margin:1rem auto; display:block; }
+
+    .main {
+      padding: 1rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    section {
+      display: none;
+      margin-top: 1.5rem;
+    }
+    section.active {
+      display: block;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.6rem;
+      text-align: center;
+    }
+
+    th {
+      background: #b6a564;
+      color: white;
+    }
+
+    .loader {
+      text-align: center;
+      margin-top: 1rem;
+      color: #999;
+    }
   </style>
 </head>
 <body>
@@ -67,291 +141,146 @@
 <div id="overlay" class="overlay">
   <div class="password-box">
     <h3>أدخل كلمة المرور</h3>
-    <input type="password" id="admin-pass" placeholder="🔒 كلمة المرور"/>
+    <input type="password" id="admin-pass" placeholder="🔒 كلمة المرور">
     <button onclick="checkPassword()">دخول</button>
     <div id="pass-error" class="error"></div>
   </div>
 </div>
 
-<!-- لوحة التحكم -->
+<!-- محتوى لوحة التحكم -->
 <div id="dashboard" style="display:none;">
   <div class="topnav">
-<div id="tab-stu" class="active" onclick="showSection('students')">👥 الطلاب</div>
-<div id="tab-con" onclick="showSection('content')">📁 المحتوى</div>
-<div id="tab-ann" onclick="showSection('announce')">🔔 الإعلانات</div>
-<div id="tab-stat" onclick="showSection('stats')">📊 الإحصائيات</div>
+    <div id="tab-stu" class="active" onclick="showSection('students')">👥 الطلاب</div>
+    <div id="tab-con" onclick="showSection('content')">📁 المحتوى</div>
+    <div id="tab-ann" onclick="showSection('announce')">🔔 الإعلانات</div>
+    <div id="tab-stat" onclick="showSection('stats')">📊 الإحصائيات</div>
   </div>
+
   <div class="main">
-
-    <!-- قسم الطلاب -->
-<section id="students" class="active">
-  <h2>قائمة الطلاب</h2>
-
-  <div class="form-group">
-    <input type="text" id="student-search" placeholder="🔍 ابحث بالاسم أو الهاتف" oninput="filterStudents()" />
-  </div>
-  <div id="loader-stu" class="loader">جاري التحميل…</div>
-  <table id="tbl-stu" style="display:none;">
-        <thead><tr>
-          <th>هاتف</th><th>اسم</th><th>مرحلة</th><th>محافظة</th>
-          <th>مفعل؟</th><th>تاريخ التسجيل</th><th>إجراءات</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- قسم المحتوى -->
-    <section id="content">
-      <h2>إضافة محتوى</h2>
-      <div class="form-group">
-        <label>المرحلة</label>
-        <select id="content-stage">
-          <option value="">-- اختر المرحلة --</option>
-          <option value="grade4">الصف الرابع</option>
-          <option value="grade5">الصف الخامس</option>
-          <option value="grade6">الصف السادس</option>
-          <option value="prep1">الأول إعدادي</option>
-          <option value="prep2">الثاني إعدادي</option>
-          <option value="prep3">الثالث إعدادي</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>نوع المحتوى</label>
-        <select id="content-type">
-          <option value="video">فيديو</option>
-          <option value="file">ملف</option>
-          <option value="quiz">اختبار</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>عنوان المحتوى</label>
-        <input type="text" id="content-title"/>
-      </div>
-      <div class="form-group">
-        <label>رابط المحتوى</label>
-        <input type="text" id="content-url"/>
-      </div>
-      <div class="form-group">
-        <label>مدة الفيديو (اختياري)</label>
-        <input type="text" id="content-duration" placeholder="مثال: 10:30"/>
-      </div>
-      <button class="action active-btn" onclick="submitContent()">➕ نشر</button>
-      <div id="loader-con" class="loader">جاري تحميل المحتوى…</div>
-      <table id="tbl-con" style="display:none;">
-        <thead><tr><th>ID</th><th>مرحلة</th><th>نوع</th><th>عنوان</th><th>رابط</th><th>مدة</th><th>حذف</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- قسم الإعلانات -->
-    <section id="announce">
-      <h2>نشر إعلان</h2>
-      <div class="form-group">
-        <label>المرحلة المستهدفة</label>
-        <select id="ann-stage">
-          <option value="">-- اختر المرحلة --</option>
-          <option value="grade4">الصف الرابع</option>
-          <option value="grade5">الصف الخامس</option>
-          <option value="grade6">الصف السادس</option>
-          <option value="prep1">الأول إعدادي</option>
-          <option value="prep2">الثاني إعدادي</option>
-          <option value="prep3">الثالث إعدادي</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>نص الإعلان</label>
-        <textarea id="ann-text" rows="3"></textarea>
-      </div>
-      <button class="action active-btn" onclick="addAnnouncement()">➕ نشر</button>
-      <div id="loader-ann" class="loader">جاري تحميل الإعلانات…</div>
-      <table id="tbl-ann" style="display:none;">
-        <thead><tr><th>مرحلة</th><th>نص الإعلان</th><th>حذف</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- قسم الإحصائيات -->
-    <section id="stats">
-      <h2>إحصائيات المنصة</h2>
-      <canvas id="chartStages"></canvas>
-      <p>📌 إجمالي الطلاب: <span id="cntAll">0</span></p>
-      <p>✅ مشتركون مفعلون: <span id="cntActive">0</span></p>
-    </section>
-
+    <!-- سيتم إدراج كل قسم هنا لاحقًا -->
   </div>
 </div>
 
+</body>
+</html>
+<!-- Firebase scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <script>
-  // ==== إعداد Firebase ====
+  // إعدادات Firebase للمشروع الجديد
   const firebaseConfig = {
-    apiKey: "AIzaSyAQ71OtMZ3jvoSgziKsyxB1XUKhz9WFRSA",
-    authDomain: "monasat-oloum.firebaseapp.com",
-    databaseURL: "https://monasat-oloum-default-rtdb.firebaseio.com",
-    projectId: "monasat-oloum",
-    storageBucket: "monasat-oloum.appspot.com",
-    messagingSenderId: "500281750476",
-    appId: "1:500281750476:web:67aa4bf47d5744dc5f6369"
+    apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
+    authDomain: "manssat-science.firebaseapp.com",
+    databaseURL: "https://manssat-science-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "manssat-science",
+    storageBucket: "manssat-science.appspot.com",
+    messagingSenderId: "22539678455",
+    appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // ==== دخول بباسورد ثابت ====
-  const SECRET = "islamemad01122104596";
+  // كلمة المرور الثابتة
+  const ADMIN_PASSWORD = "islamemad01122104596#";
+
+  // التحقق من الباسورد
   function checkPassword() {
-    const pass = document.getElementById('admin-pass').value.trim();
-    if (pass === SECRET) {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      showSection('students');
-      loadStudents(); loadStats();
+    const input = document.getElementById("admin-pass").value.trim();
+    const errorDiv = document.getElementById("pass-error");
+
+    if (input === ADMIN_PASSWORD) {
+      // حفظ الباسورد في localStorage
+      localStorage.setItem("adminAccess", "granted");
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      showSection("students");
     } else {
-      document.getElementById('pass-error').innerText = 'كلمة المرور غير صحيحة.';
+      errorDiv.innerText = "❌ كلمة المرور غير صحيحة";
     }
   }
 
-  // ==== تبديل الأقسام ====
+  // تحميل الصفحة تلقائيًا إذا كانت الباسورد محفوظة
+  window.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("adminAccess");
+    if (saved === "granted") {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      showSection("students");
+    }
+  });
+
+  // تبديل الأقسام
   function showSection(id) {
-    ['students','content','announce','stats'].forEach(sec => {
-      document.getElementById(sec).classList.toggle('active', sec === id);
-      document.getElementById('tab-'+sec.slice(0,3)).classList.toggle('active', sec === id);
+    ["students", "content", "announce", "stats"].forEach(section => {
+      const secEl = document.getElementById(section);
+      const tabEl = document.getElementById("tab-" + section.slice(0, 3));
+      if (secEl && tabEl) {
+        secEl.classList.toggle("active", section === id);
+        tabEl.classList.toggle("active", section === id);
+      }
     });
   }
-
-  // ==== إدارة الطلاب ====
+</script>
+<script>
+  // تحميل بيانات الطلاب
   function loadStudents() {
-    document.getElementById('loader-stu').style.display = 'block';
-    const tbl = document.getElementById('tbl-stu');
-    const body = tbl.querySelector('tbody');
-    body.innerHTML = '';
-    db.ref('users/students').once('value').then(snap => {
-      const data = snap.val() || {};
-      let total=0, active=0;
-      Object.entries(data).forEach(([ph, st]) => {
-        total++; if (st.subscription?.active) active++;
-        const row = document.createElement('tr');
+    const loader = document.getElementById("loader-stu");
+    const tbl = document.getElementById("tbl-stu");
+    const body = tbl.querySelector("tbody");
+    loader.style.display = "block";
+    tbl.style.display = "none";
+    body.innerHTML = "";
+
+    db.ref("users/students").once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      let total = 0;
+      let active = 0;
+
+      Object.entries(data).forEach(([phone, user]) => {
+        total++;
+        if (user["اشتراك_مفعل"]) active++;
+
+        const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${ph}</td>
-          <td>${st.name||'-'}</td>
-          <td>${st.stage||'-'}</td>
-          <td>${st.governorate||'-'}</td>
-          <td>${st.subscription?.active?'✅':'❌'}</td>
-          <td>${st.registeredAt?new Date(st.registeredAt).toLocaleDateString('ar-EG'):'-'}</td>
+          <td>${phone}</td>
+          <td>${user["الاسم"] || "-"}</td>
+          <td>${user["المرحلة"] || "-"}</td>
+          <td>${user["المحافظة"] || "-"}</td>
+          <td>${user["اشتراك_مفعل"] ? "✅" : "❌"}</td>
+          <td>${user["مسجل_في"] ? new Date(user["مسجل_في"]).toLocaleDateString('ar-EG') : "-"}</td>
           <td>
-            <button class="action ${st.subscription?.active?'inactive-btn':'active-btn'}"
-              onclick="db.ref('users/students/${ph}/subscription/active').set(${!st.subscription?.active}).then(loadStudents)">
-              ${st.subscription?.active?'إلغاء':'تفعيل'}
+            <button class="action ${user["اشتراك_مفعل"] ? "inactive-btn" : "active-btn"}"
+              onclick="toggleActivation('${phone}', ${user["اشتراك_مفعل"] ? "false" : "true"})">
+              ${user["اشتراك_مفعل"] ? "إلغاء" : "تفعيل"}
             </button>
-            <button class="action delete-btn"
-              onclick="if(confirm('حذف الطالب؟')) db.ref('users/students/${ph}').remove().then(loadStudents)">
-              حذف
-            </button>
-          </td>`;
+            <button class="action delete-btn" onclick="deleteStudent('${phone}')">حذف</button>
+          </td>
+        `;
         body.appendChild(row);
       });
-      document.getElementById('cntAll').innerText = total;
-      document.getElementById('cntActive').innerText = active;
+
+      document.getElementById("cntAll").innerText = total;
+      document.getElementById("cntActive").innerText = active;
     }).finally(() => {
-      document.getElementById('loader-stu').style.display = 'none';
-      tbl.style.display = 'table';
+      loader.style.display = "none";
+      tbl.style.display = "table";
     });
   }
 
-  // ==== إدارة المحتوى ====
-  function submitContent() {
-    const s = document.getElementById('content-stage').value;
-    const t = document.getElementById('content-type').value;
-    const ti= document.getElementById('content-title').value.trim();
-    const u = document.getElementById('content-url').value.trim();
-    const d = document.getElementById('content-duration').value.trim();
-    if(!s||!t||!ti||!u) return alert('املأ كل الحقول.');
-    const id = Date.now();
-    db.ref(`content/${s}/${id}`).set({ type:t, title:ti, url:u, duration:d||'-', createdAt:new Date().toISOString() })
-      .then(loadContent);
-  }
-  function loadContent() {
-    document.getElementById('loader-con').style.display = 'block';
-    const tbl = document.getElementById('tbl-con'), body = tbl.querySelector('tbody');
-    body.innerHTML = '';
-    db.ref('content').once('value').then(snap => {
-      snap.forEach(stg => {
-        stg.forEach(item => {
-          const it = item.val();
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item.key}</td>
-            <td>${stg.key}</td>
-            <td>${it.type}</td>
-            <td>${it.title}</td>
-            <td><a href="${it.url}" target="_blank">رابط</a></td>
-            <td>${it.duration}</td>
-            <td>
-              <button class="action delete-btn"
-                onclick="db.ref('content/${stg.key}/${item.key}').remove().then(loadContent)">
-                حذف
-              </button>
-            </td>`;
-          body.appendChild(row);
-        });
-      });
-    }).finally(()=>{
-      document.getElementById('loader-con').style.display = 'none';
-      tbl.style.display = 'table';
-    });
+  // تفعيل أو إلغاء الطالب
+  function toggleActivation(phone, status) {
+    db.ref(`users/students/${phone}/اشتراك_مفعل`).set(status).then(loadStudents);
   }
 
-  // ==== إدارة الإعلانات ====
-  function addAnnouncement() {
-    const s = document.getElementById('ann-stage').value;
-    const txt = document.getElementById('ann-text').value.trim();
-    if(!s||!txt) return alert('املأ كل الحقول.');
-    db.ref(`settings/announcements/${s}`).set({ text:txt, updatedAt:new Date().toISOString() })
-      .then(loadAnnouncements);
-  }
-  function loadAnnouncements() {
-    document.getElementById('loader-ann').style.display = 'block';
-    const tbl = document.getElementById('tbl-ann'), body = tbl.querySelector('tbody');
-    body.innerHTML = '';
-    db.ref('settings/announcements').once('value').then(snap => {
-      snap.forEach(p => {
-        const v = p.val();
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${p.key}</td>
-          <td>${v.text}</td>
-          <td>
-            <button class="action delete-btn"
-              onclick="db.ref('settings/announcements/${p.key}').remove().then(loadAnnouncements)">
-              حذف
-            </button>
-          </td>`;
-        body.appendChild(row);
-      });
-    }).finally(()=>{
-      document.getElementById('loader-ann').style.display = 'none';
-      tbl.style.display = 'table';
-    });
+  // حذف الطالب
+  function deleteStudent(phone) {
+    if (confirm("هل أنت متأكد أنك تريد حذف هذا الطالب؟")) {
+      db.ref(`users/students/${phone}`).remove().then(loadStudents);
+    }
   }
 
-  // ==== الإحصائيات ====
-  let chart;
-  function loadStats() {
-    db.ref('users/students').once('value').then(snap => {
-      const cnts = { grade4:0,grade5:0,grade6:0,prep1:0,prep2:0,prep3:0 };
-      Object.values(snap.val()||{}).forEach(u=>{
-        if(cnts[u.stage]!=undefined) cnts[u.stage]++;
-      });
-      const ctx = document.getElementById('chartStages').getContext('2d');
-      if(chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels:['رابع','خامس','سادس','1إعدادي','2إعدادي','3إعدادي'], datasets:[{ label:'عدد الطلاب', data:Object.values(cnts) }] }
-      });
-    });
-  }
-
-  // ==== التهيئة ====
-showSection('students');
-
+  // بحث ديناميكي
   function filterStudents() {
     const input = document.getElementById("student-search").value.trim().toLowerCase();
     const rows = document.querySelectorAll("#tbl-stu tbody tr");
@@ -362,6 +291,207 @@ showSection('students');
     });
   }
 </script>
+<script>
+  // نشر محتوى جديد
+  function submitContent() {
+    const stage = document.getElementById("content-stage").value;
+    const type = document.getElementById("content-type").value;
+    const title = document.getElementById("content-title").value.trim();
+    const url = document.getElementById("content-url").value.trim();
+    const duration = document.getElementById("content-duration").value.trim();
+
+    if (!stage || !type || !title || !url) {
+      alert("⚠️ من فضلك املأ كل الحقول المطلوبة.");
+      return;
+    }
+
+    const id = Date.now(); // ID فريد بالوقت
+    db.ref(`content/${stage}/${id}`).set({
+      type,
+      title,
+      url,
+      duration: duration || "-",
+      createdAt: new Date().toISOString()
+    }).then(() => {
+      loadContent();
+      document.getElementById("content-title").value = "";
+      document.getElementById("content-url").value = "";
+      document.getElementById("content-duration").value = "";
+    });
+  }
+
+  // تحميل كل المحتوى
+  function loadContent() {
+    const loader = document.getElementById("loader-con");
+    const tbl = document.getElementById("tbl-con");
+    const body = tbl.querySelector("tbody");
+
+    loader.style.display = "block";
+    tbl.style.display = "none";
+    body.innerHTML = "";
+
+    db.ref("content").once("value").then(snapshot => {
+      snapshot.forEach(stageSnap => {
+        const stage = stageSnap.key;
+        stageSnap.forEach(itemSnap => {
+          const item = itemSnap.val();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${itemSnap.key}</td>
+            <td>${stage}</td>
+            <td>${item.type}</td>
+            <td>${item.title}</td>
+            <td><a href="${item.url}" target="_blank">رابط</a></td>
+            <td>${item.duration}</td>
+            <td>
+              <button class="action delete-btn"
+                onclick="deleteContent('${stage}', '${itemSnap.key}')">حذف</button>
+            </td>
+          `;
+          body.appendChild(row);
+        });
+      });
+    }).finally(() => {
+      loader.style.display = "none";
+      tbl.style.display = "table";
+    });
+  }
+
+  // حذف محتوى
+  function deleteContent(stage, id) {
+    if (confirm("🗑️ هل تريد حذف هذا المحتوى؟")) {
+      db.ref(`content/${stage}/${id}`).remove().then(loadContent);
+    }
+  }
 </script>
-</body>
-</html>
+<script>
+  // نشر إعلان
+  function addAnnouncement() {
+    const stage = document.getElementById("ann-stage").value;
+    const text = document.getElementById("ann-text").value.trim();
+
+    if (!stage || !text) {
+      alert("⚠️ من فضلك اختر المرحلة واكتب نص الإعلان.");
+      return;
+    }
+
+    db.ref(`settings/announcements/${stage}`).set({
+      text: text,
+      updatedAt: new Date().toISOString()
+    }).then(() => {
+      loadAnnouncements();
+      document.getElementById("ann-text").value = "";
+    });
+  }
+
+  // تحميل كل الإعلانات
+  function loadAnnouncements() {
+    const loader = document.getElementById("loader-ann");
+    const tbl = document.getElementById("tbl-ann");
+    const body = tbl.querySelector("tbody");
+
+    loader.style.display = "block";
+    tbl.style.display = "none";
+    body.innerHTML = "";
+
+    db.ref("settings/announcements").once("value").then(snapshot => {
+      snapshot.forEach(child => {
+        const value = child.val();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${child.key}</td>
+          <td>${value.text}</td>
+          <td>
+            <button class="action delete-btn"
+              onclick="deleteAnnouncement('${child.key}')">حذف</button>
+          </td>
+        `;
+        body.appendChild(row);
+      });
+    }).finally(() => {
+      loader.style.display = "none";
+      tbl.style.display = "table";
+    });
+  }
+
+  // حذف إعلان
+  function deleteAnnouncement(stage) {
+    if (confirm("🗑️ هل تريد حذف هذا الإعلان؟")) {
+      db.ref(`settings/announcements/${stage}`).remove().then(loadAnnouncements);
+    }
+  }
+</script>
+<script>
+  let chart;
+
+  function loadStats() {
+    db.ref("users/students").once("value").then(snapshot => {
+      const counts = {
+        grade4: 0,
+        grade5: 0,
+        grade6: 0,
+        prep1: 0,
+        prep2: 0,
+        prep3: 0
+      };
+
+      let total = 0;
+      let active = 0;
+
+      snapshot.forEach(child => {
+        const data = child.val();
+        const stage = data["المرحلة"];
+        const isActive = data["اشتراك_مفعل"];
+
+        total++;
+        if (isActive) active++;
+
+        if (stage && counts.hasOwnProperty(stage)) {
+          counts[stage]++;
+        }
+      });
+
+      // عرض الأرقام
+      document.getElementById("cntAll").innerText = total;
+      document.getElementById("cntActive").innerText = active;
+
+      // رسم المخطط البياني
+      const ctx = document.getElementById("chartStages").getContext("2d");
+      if (chart) chart.destroy(); // إلغاء الرسم السابق
+
+      chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["رابع", "خامس", "سادس", "أول إعدادي", "ثاني إعدادي", "ثالث إعدادي"],
+          datasets: [{
+            label: "عدد الطلاب",
+            data: Object.values(counts),
+            backgroundColor: "#3ab54a"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: "توزيع الطلاب حسب المرحلة" }
+          }
+        }
+      });
+    });
+  }
+</script>
+<script>
+  // تشغيل قسم الطلاب تلقائيًا عند الدخول
+  showSection('students');
+
+  // خاصية البحث داخل جدول الطلاب
+  function filterStudents() {
+    const input = document.getElementById("student-search").value.trim().toLowerCase();
+    const rows = document.querySelectorAll("#tbl-stu tbody tr");
+    rows.forEach(row => {
+      const phone = row.cells[0].innerText.toLowerCase();
+      const name = row.cells[1].innerText.toLowerCase();
+      row.style.display = (phone.includes(input) || name.includes(input)) ? "" : "none";
+    });
+  }
+</script>
