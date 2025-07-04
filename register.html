@@ -79,7 +79,7 @@
   <h2>📝 إنشاء حساب جديد</h2>
   
   <label for="phone">رقم الهاتف</label>
-  <input type="text" id="phone" placeholder="مثال: 011xxxxxxxx" maxlength="11" readonly />
+  <input type="text" id="phone" placeholder="مثال: 011xxxxxxxx" maxlength="11" />
   
   <label for="name">الاسم بالكامل</label>
   <input type="text" id="name" placeholder="أدخل اسمك بالكامل" />
@@ -203,10 +203,9 @@
 
   // تعبئة رقم الهاتف من الصفحة السابقة
   document.addEventListener('DOMContentLoaded', () => {
-    const tempPhone = localStorage.getItem('tempPhone');
+    const tempPhone = localStorage.getItem('studentPhone');
     if (tempPhone) {
       document.getElementById('phone').value = tempPhone;
-      localStorage.removeItem('tempPhone');
     }
   });
 </script>
