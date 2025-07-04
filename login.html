@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل الدخول - منصة مادة العلوم</title>
+  <title>تسجيل الدخول - منصة العلوم</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
-    * { box-sizing: border-box; margin:0; padding:0; }
     body {
       font-family: 'Tajawal', sans-serif;
       background: linear-gradient(135deg, #252525, #3b3b3b);
@@ -17,6 +16,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .login-container {
       background: #1e1e1e;
@@ -29,12 +29,11 @@
       text-align: center;
       color: #f1c40f;
       margin-bottom: 1.5rem;
-      font-size: 1.5rem;
     }
     label {
       display: block;
-      margin: 0.8rem 0 0.3rem;
-      font-size: 0.95rem;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
     }
     input {
       width: 100%;
@@ -56,16 +55,12 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #d4ac0d;
     }
     .message {
       margin-top: 1rem;
       text-align: center;
-      font-size: 0.95rem;
       min-height: 1.2rem;
+      font-size: 0.95rem;
       color: #ff8080;
     }
     footer {
@@ -86,7 +81,7 @@
   <input type="text" id="phone" placeholder="مثال: 011xxxxxxxx" maxlength="11" />
 
   <label for="password">كلمة المرور</label>
-  <input type="password" id="password" placeholder="أدخل 8 أرقام" maxlength="8" />
+  <input type="password" id="password" placeholder="أدخل كلمة المرور" />
 
   <button onclick="login()">دخول</button>
   <div class="message" id="login-msg"></div>
@@ -122,8 +117,8 @@
       return;
     }
 
-    if (!/^\d{8,}$/.test(password)) {
-      showMessage("🔒 كلمة المرور يجب أن تكون 8 أرقام على الأقل.");
+    if (!password || password.length < 4) {
+      showMessage("🔒 أدخل كلمة مرور صالحة.");
       return;
     }
 
@@ -131,7 +126,9 @@
       const user = snapshot.val();
 
       if (!user) {
-        showMessage("🚫 لا يوجد حساب بهذا الرقم.");
+        // الحساب غير موجود
+        showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
+        setTimeout(() => window.location.href = "register.html", 2000);
         return;
       }
 
@@ -141,7 +138,8 @@
       }
 
       if (!user["اشتراك_مفعل"]) {
-        showMessage("⏳ الحساب غير مفعل. انتظر التفعيل من المسؤول.");
+        showMessage("⏳ الحساب غير مفعل. سيتم توجيهك للدفع...");
+        setTimeout(() => window.location.href = "payment.html", 2000);
         return;
       }
 
@@ -151,13 +149,11 @@
         return;
       }
 
-      showMessage("✅ جاري التحويل...", true);
-      setTimeout(() => {
-        window.location.href = stage + ".html";
-      }, 1500);
+      showMessage("✅ تسجيل دخول ناجح. جارٍ التوجيه...", true);
+      setTimeout(() => window.location.href = stage + ".html", 1500);
     }).catch(err => {
       console.error(err);
-      showMessage("⚠️ حدث خطأ. حاول مرة أخرى.");
+      showMessage("⚠️ حدث خطأ أثناء الاتصال. حاول مرة أخرى.");
     });
   }
 </script>
