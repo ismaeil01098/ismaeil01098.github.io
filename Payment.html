@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -60,7 +61,7 @@
       margin: 0.4rem 0;
       font-size: 0.95rem;
     }
-  button {
+    button {
       width: 100%;
       margin-top: 1.2rem;
       padding: 0.8rem;
@@ -118,37 +119,38 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>خطوة الدفع للمنصة</h2>
+  <div class="container">
+    <h2>خطوة الدفع للمنصة</h2>
 
-  <label for="stage">اختر المرحلة الدراسية</label>
-  <select id="stage" onchange="setPrice()">
-    <option value="">-- اختر المرحلة --</option>
-    <option value="grade4">الصف الرابع</option>
-    <option value="grade5">الصف الخامس</option>
-    <option value="grade6">الصف السادس</option>
-    <option value="prep1">الصف الأول الإعدادي</option>
-    <option value="prep2">الصف الثاني الإعدادي</option>
-    <option value="prep3">الصف الثالث الإعدادي</option>
-  </select>
+    <label for="stage">اختر المرحلة الدراسية</label>
+    <select id="stage" onchange="setPrice()">
+      <option value="">-- اختر المرحلة --</option>
+      <option value="grade4">الصف الرابع</option>
+      <option value="grade5">الصف الخامس</option>
+      <option value="grade6">الصف السادس</option>
+      <option value="prep1">الصف الأول الإعدادي</option>
+      <option value="prep2">الصف الثاني الإعدادي</option>
+      <option value="prep3">الصف الثالث الإعدادي</option>
+    </select>
 
-  <div class="highlight" id="price">يرجى اختيار المرحلة</div>
+    <div class="highlight" id="price">يرجى اختيار المرحلة</div>
 
-  <div class="box">
-    <h4>بيانات الدفع</h4>
-    <p>📱 اتصالات كاش / إنستاباي: <strong>01122104596</strong></p>
-    <p>📱 فودافون كاش: <strong>01011598392</strong></p>
-    <p>📨 أرسل صورة الدفع على واتساب: <a href="https://wa.me/201202326992" target="_blank" style="color:#00ffcc;">01202326992</a></p>
+    <div class="box">
+      <h4>بيانات الدفع</h4>
+      <p>📱 اتصالات كاش / إنستاباي: <strong>01122104596</strong></p>
+      <p>📱 فودافون كاش: <strong>01011598392</strong></p>
+      <p>📨 أرسل صورة الدفع على واتساب: <a href="https://wa.me/201202326992" target="_blank" style="color:#00ffcc;">01202326992</a></p>
+    </div>
+
+    <label for="phone">رقم هاتف الطالب</label>
+    <input type="text" id="phone" placeholder="أدخل رقم الهاتف (11 رقمًا)" maxlength="11" />
+
+    <button onclick="markAsSent()">✔️ تم إرسال صورة الدفع</button>
+    <button onclick="checkActivation()">🔄 تحقق من التفعيل</button>
+    <button onclick="goToPlatform()">🚀 الانتقال إلى المنصة</button>
+
+    <div id="status"></div>
   </div>
-
-  <label for="phone">رقم هاتف الطالب</label>
-  <input type="text" id="phone" placeholder="أدخل رقم الهاتف (11 رقمًا)" maxlength="11" />
-
-  <button onclick="markAsSent()">✔️ تم إرسال صورة الدفع</button>
-  <button onclick="checkActivation()">🔄 تحقق من التفعيل</button>
-  <button onclick="goToPlatform()">🚀 الانتقال إلى المنصة</button>
-
-  <div id="status"></div>
 
   <!-- زر الدعم الفني -->
   <div id="support-btn" onclick="toggleSupport()">💬 الأسئلة الشائعة</div>
@@ -165,18 +167,18 @@
     </ul>
     <p style="margin-top:1rem;">📞 للدعم الفني: <b>01011598392</b></p>
   </div>
-</div>
-<script>
-  // إعداد Firebase
+  <script>
+  // إعداد Firebase (manssat-science)
   const firebaseConfig = {
-    apiKey: "AIzaSyAQ71OtMZ3jvoSgziKsyxB1XUKhz9WFRSA",
-    authDomain: "monasat-oloum.firebaseapp.com",
-    databaseURL: "https://monasat-oloum-default-rtdb.firebaseio.com",
-    projectId: "monasat-oloum",
-    storageBucket: "monasat-oloum.appspot.com",
-    messagingSenderId: "500281750476",
-    appId: "1:500281750476:web:67aa4bf47d5744dc5f6369"
+    apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
+    authDomain: "manssat-science.firebaseapp.com",
+    databaseURL: "https://manssat-science-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "manssat-science",
+    storageBucket: "manssat-science.appspot.com",
+    messagingSenderId: "22539678455",
+    appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2",
   };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
@@ -193,7 +195,7 @@
     }
   }
 
-  // زر تم إرسال صورة الدفع
+  // إرسال صورة الدفع
   function markAsSent() {
     const phone = document.getElementById("phone").value.trim();
     if (!/^\d{11}$/.test(phone)) {
@@ -201,11 +203,13 @@
       return;
     }
 
-    db.ref(`users/students/${phone}/payment`).set({
+    db.ref("users/students/" + phone + "/payment").set({
       sent: true,
       sentAt: new Date().toISOString()
     }).then(() => {
       document.getElementById("status").innerText = "✅ تم تسجيل إرسال صورة الدفع. يرجى انتظار التفعيل.";
+    }).catch((err) => {
+      alert("❌ حدث خطأ أثناء الإرسال: " + err.message);
     });
   }
 
@@ -217,23 +221,26 @@
       return;
     }
 
-    db.ref(`users/students/${phone}/subscription`).once("value", snapshot => {
-      const data = snapshot.val();
-      if (data?.active === true) {
-        // سجل وقت التفعيل
-        db.ref(`users/students/${phone}/subscription/startedAt`).set(new Date().toISOString());
+    db.ref("users/students/" + phone + "/subscription").once("value")
+      .then(snapshot => {
+        const data = snapshot.val();
+        if (data?.active === true) {
+          // سجل وقت التفعيل
+          db.ref("users/students/" + phone + "/subscription/startedAt").set(new Date().toISOString());
 
-        document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 2000);
-      } else {
-        document.getElementById("status").innerText = "⏳ لم يتم التفعيل بعد، يرجى الانتظار قليلاً.";
-      }
-    });
+          document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 2000);
+        } else {
+          document.getElementById("status").innerText = "⏳ لم يتم التفعيل بعد، يرجى الانتظار قليلاً.";
+        }
+      }).catch((error) => {
+        alert("❌ حدث خطأ في التحقق: " + error.message);
+      });
   }
 
-  // الانتقال إلى المنصة إذا تم التفعيل
+  // الانتقال إلى المنصة بعد التفعيل
   function goToPlatform() {
     const phone = document.getElementById("phone").value.trim();
     if (!/^\d{11}$/.test(phone)) {
@@ -241,28 +248,31 @@
       return;
     }
 
-    db.ref(`users/students/${phone}`).once("value", snap => {
-      const data = snap.val();
-      if (data?.subscription?.active) {
-        const stage = data.stage;
-        if (stage) {
-          window.location.href = `${stage}.html`;
+    db.ref("users/students/" + phone).once("value")
+      .then(snap => {
+        const data = snap.val();
+        if (data?.subscription?.active) {
+          const stage = data.stage;
+          if (stage) {
+            window.location.href = stage + ".html";
+          } else {
+            alert("⚠️ لم يتم تحديد المرحلة بعد.");
+          }
         } else {
-          alert("⚠️ لم يتم تحديد المرحلة بعد.");
+          alert("⛔ لم يتم تفعيل الحساب بعد.");
         }
-      } else {
-        alert("⛔ لم يتم تفعيل الحساب بعد.");
-      }
-    });
+      }).catch((err) => {
+        alert("❌ حدث خطأ أثناء التحقق: " + err.message);
+      });
   }
 
-  // فتح أو إغلاق نافذة الدعم الفني
+  // عرض أو إخفاء الدعم الفني
   function toggleSupport() {
     const popup = document.getElementById("support-popup");
     popup.style.display = popup.style.display === "none" ? "block" : "none";
   }
-</script>
-<style>
+  </script>
+  <style>
   body {
     font-family: 'Tajawal', sans-serif;
     background: linear-gradient(135deg, #2f2f2f, #3d3d3d);
@@ -419,4 +429,4 @@
       left: 5%;
     }
   }
-</style>
+    </style>
