@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إنشاء حساب جديد - منصة العلوم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #343434, #505050);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #2c2c2c;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 95%;
+      max-width: 450px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      text-align: center;
+      color: #ffdd57;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: bold;
+      color: #f1f1f1;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      background: #eee;
+      color: #000;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #ffdd57;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #000;
+      cursor: pointer;
+      transition: 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background: #f7c934;
+    }
+
+    .error {
+      color: #ff7070;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>إنشاء حساب جديد</h2>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="name">الاسم الثلاثي (بالعربية)</label>
+        <input type="text" id="name" required>
+        <div class="error" id="error-name"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">رقم الهاتف (11 رقم إنجليزي)</label>
+        <input type="text" id="phone" maxlength="11" required>
+        <div class="error" id="error-phone"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">كلمة المرور (أرقام فقط، 8 خانات على الأقل)</label>
+        <input type="password" id="password" required>
+        <div class="error" id="error-password"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm">تأكيد كلمة المرور</label>
+        <input type="password" id="confirm" required>
+        <div class="error" id="error-confirm"></div>
+      </div>
+      <div class="form-group">
+        <label for="stage">المرحلة الدراسية</label>
+        <select id="stage" required>
+          <option value="">-- اختر المرحلة --</option>
+          <option value="grade4">الصف الرابع</option>
+          <option value="grade5">الصف الخامس</option>
+          <option value="grade6">الصف السادس</option>
+          <option value="prep1">الصف الأول الإعدادي</option>
+          <option value="prep2">الصف الثاني الإعدادي</option>
+          <option value="prep3">الصف الثالث الإعدادي</option>
+        </select>
+        <div class="error" id="error-stage"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="age">العمر</label>
+        <input type="number" id="age" min="7" max="18" required>
+        <div class="error" id="error-age"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="governorate">المحافظة</label>
+        <select id="governorate" required>
+          <option value="">-- اختر المحافظة --</option>
+          <option value="القاهرة">القاهرة</option>
+          <option value="الجيزة">الجيزة</option>
+          <option value="الأسكندرية">الأسكندرية</option>
+          <option value="الدقهلية">الدقهلية</option>
+          <option value="البحر الأحمر">البحر الأحمر</option>
+          <option value="البحيرة">البحيرة</option>
+          <option value="الفيوم">الفيوم</option>
+          <option value="الغربية">الغربية</option>
+          <option value="الإسماعيلية">الإسماعيلية</option>
+          <option value="المنوفية">المنوفية</option>
+          <option value="المنيا">المنيا</option>
+          <option value="القليوبية">القليوبية</option>
+          <option value="الوادي الجديد">الوادي الجديد</option>
+          <option value="السويس">السويس</option>
+          <option value="أسوان">أسوان</option>
+          <option value="أسيوط">أسيوط</option>
+          <option value="بني سويف">بني سويف</option>
+          <option value="بورسعيد">بورسعيد</option>
+          <option value="دمياط">دمياط</option>
+          <option value="الشرقية">الشرقية</option>
+          <option value="جنوب سيناء">جنوب سيناء</option>
+          <option value="كفر الشيخ">كفر الشيخ</option>
+          <option value="مطروح">مطروح</option>
+          <option value="الأقصر">الأقصر</option>
+          <option value="قنا">قنا</option>
+          <option value="شمال سيناء">شمال سيناء</option>
+          <option value="سوهاج">سوهاج</option>
+        </select>
+        <div class="error" id="error-gov"></div>
+      </div>
+
+      <button type="submit" class="btn">إنشاء الحساب</button>
+    </form>
+  </div>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  // إعداد Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQ71OtMZ3jvoSgziKsyxB1XUKhz9WFRSA",
+    authDomain: "monasat-oloum.firebaseapp.com",
+    databaseURL: "https://monasat-oloum-default-rtdb.firebaseio.com",
+    projectId: "monasat-oloum",
+    storageBucket: "monasat-oloum.appspot.com",
+    messagingSenderId: "500281750476",
+    appId: "1:500281750476:web:67aa4bf47d5744dc5f6369"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  document.getElementById("registerForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    
+    // القيم
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirm = document.getElementById("confirm").value.trim();
+    const stage = document.getElementById("stage").value;
+    const age = parseInt(document.getElementById("age").value);
+    const gov = document.getElementById("governorate").value;
+
+    // تفريغ الأخطاء
+    document.querySelectorAll(".error").forEach(e => e.innerText = "");
+
+    let valid = true;
+
+    // تحقق من الاسم (عربي فقط)
+    if (!/^[\u0600-\u06FF\s]{3,}$/.test(name)) {
+      document.getElementById("error-name").innerText = "❌ الاسم يجب أن يكون باللغة العربية فقط";
+      valid = false;
+    }
+
+    // تحقق من الرقم (11 رقم إنجليزي)
+    if (!/^[0-9]{11}$/.test(phone)) {
+      document.getElementById("error-phone").innerText = "❌ يجب إدخال رقم مكون من 11 رقم إنجليزي فقط";
+      valid = false;
+    }
+
+    // تحقق من كلمة المرور
+    if (password.length < 8) {
+      document.getElementById("error-password").innerText = "❌ كلمة المرور يجب أن تكون 8 أرقام على الأقل";
+      valid = false;
+    }
+
+    if (password !== confirm) {
+      document.getElementById("error-confirm").innerText = "❌ كلمتا المرور غير متطابقتين";
+      valid = false;
+    }
+
+    if (!stage) {
+      document.getElementById("error-stage").innerText = "❌ اختر المرحلة الدراسية";
+      valid = false;
+    }
+
+    if (!age || age < 6 || age > 20) {
+      document.getElementById("error-age").innerText = "❌ أدخل العمر الصحيح";
+      valid = false;
+    }
+
+    if (!gov) {
+      document.getElementById("error-gov").innerText = "❌ اختر المحافظة";
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    // تسجيل المستخدم في قاعدة البيانات
+    const studentData = {
+      name: name,
+      password: password,
+      stage: stage,
+      age: age,
+      governorate: gov,
+      registeredAt: new Date().toISOString(),
+      subscription: {
+        startedAt: null,
+        expiresAt: null,
+        active: false
+      }
+    };
+
+    db.ref("users/students/" + phone).set(studentData).then(() => {
+      alert("✅ تم إنشاء الحساب بنجاح!");
+      window.location.href = "payment.html";
+    }).catch(err => {
+      alert("❌ حدث خطأ أثناء الحفظ: " + err.message);
+    });
+  });
+</script>
+</body>
+</html>
