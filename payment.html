@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -16,55 +15,66 @@
       margin: 0;
       padding: 2rem 1rem;
     }
+
     .container {
       max-width: 650px;
       margin: auto;
       background: #1e1e1e;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      border-radius: 14px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
       position: relative;
     }
+
     h2 {
       text-align: center;
       color: #f1c40f;
       margin-bottom: 1.5rem;
+      font-size: 1.7rem;
     }
+
     label {
       display: block;
-      margin: 0.8rem 0 0.3rem;
+      margin: 1rem 0 0.3rem;
       font-weight: bold;
+      color: #eee;
     }
+
     select, input {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.7rem;
       border-radius: 8px;
       border: none;
       font-size: 1rem;
       background: #333;
       color: #fff;
+      margin-bottom: 0.5rem;
     }
+
     .highlight {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: #2ecc71;
       text-align: center;
-      margin-top: 0.8rem;
+      margin: 0.7rem 0;
       font-weight: bold;
     }
+
     .box {
       background: #292929;
       padding: 1rem;
-      margin-top: 1.2rem;
       border-radius: 8px;
+      margin-top: 1rem;
     }
+
     .box p {
       margin: 0.4rem 0;
       font-size: 0.95rem;
     }
+
     button {
       width: 100%;
-      margin-top: 1.2rem;
-      padding: 0.8rem;
+      margin-top: 1rem;
+      padding: 0.9rem;
       font-size: 1rem;
       font-weight: bold;
       background-color: #f1c40f;
@@ -74,47 +84,85 @@
       cursor: pointer;
       transition: 0.3s;
     }
+
     button:hover {
       background-color: #d4ac0d;
     }
+
     #status {
       margin-top: 1rem;
       font-size: 1rem;
-      color: #00ffcc;
       text-align: center;
-      min-height: 20px;
+      color: #00ffcc;
+      min-height: 24px;
     }
+
+    /* زر الدعم */
     #support-btn {
       position: fixed;
       bottom: 20px;
       left: 20px;
       background: #f1c40f;
       color: #333;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 30px;
       cursor: pointer;
       font-weight: bold;
-      z-index: 1000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 999;
+      transition: 0.3s;
     }
+
+    #support-btn:hover {
+      background: #d4ac0d;
+    }
+
+    /* النافذة المنبثقة */
     #support-popup {
-      display: none;
       position: fixed;
-      bottom: 80px;
+      bottom: 75px;
       left: 20px;
       background: #222;
       color: #fff;
-      padding: 1rem;
+      padding: 1.2rem;
       border-radius: 12px;
-      width: 320px;
+      width: 300px;
       font-size: 0.9rem;
+      line-height: 1.6;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      display: none;
       z-index: 999;
     }
+
+    #support-popup h4 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #f1c40f;
+    }
+
     #support-popup ul {
       padding-left: 1rem;
+      margin: 0;
     }
-    #support-popup li {
+
+    #support-popup ul li {
       margin-bottom: 0.5rem;
-      list-style: square;
+      list-style: disc;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.2rem;
+      }
+
+      button {
+        font-size: 0.95rem;
+      }
+
+      #support-popup {
+        width: 90%;
+        left: 5%;
+      }
     }
   </style>
 </head>
@@ -139,7 +187,7 @@
       <h4>بيانات الدفع</h4>
       <p>📱 اتصالات كاش / إنستاباي: <strong>01122104596</strong></p>
       <p>📱 فودافون كاش: <strong>01011598392</strong></p>
-      <p>📨 أرسل صورة الدفع على واتساب: <a href="https://wa.me/201202326992" target="_blank" style="color:#00ffcc;">01202326992</a></p>
+      <p>📨 أرسل صورة الدفع على واتساب: <a href="https://wa.me/201202326992" target="_blank" style="color:#00ffcc; text-decoration: none;">01202326992</a></p>
     </div>
 
     <label for="phone">رقم هاتف الطالب</label>
@@ -167,266 +215,161 @@
     </ul>
     <p style="margin-top:1rem;">📞 للدعم الفني: <b>01011598392</b></p>
   </div>
+  
   <script>
-  // إعداد Firebase (manssat-science)
-  const firebaseConfig = {
-    apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
-    authDomain: "manssat-science.firebaseapp.com",
-    databaseURL: "https://manssat-science-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "manssat-science",
-    storageBucket: "manssat-science.appspot.com",
-    messagingSenderId: "22539678455",
-    appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2",
-  };
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
+      authDomain: "manssat-science.firebaseapp.com",
+      databaseURL: "https://manssat-science-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "manssat-science",
+      storageBucket: "manssat-science.appspot.com",
+      messagingSenderId: "22539678455",
+      appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
+    };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // تحديد السعر حسب المرحلة
-  function setPrice() {
-    const stage = document.getElementById("stage").value;
-    const priceDisplay = document.getElementById("price");
-    if (["grade4", "grade5", "grade6"].includes(stage)) {
-      priceDisplay.innerText = "💵 السعر: 50 جنيه مصري";
-    } else if (["prep1", "prep2", "prep3"].includes(stage)) {
-      priceDisplay.innerText = "💵 السعر: 70 جنيه مصري";
-    } else {
-      priceDisplay.innerText = "يرجى اختيار المرحلة";
+    // تهيئة التطبيق فقط إذا لم يتم تهيئته مسبقاً
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-  }
+    const db = firebase.database();
 
-  // إرسال صورة الدفع
-  function markAsSent() {
-    const phone = document.getElementById("phone").value.trim();
-    if (!/^\d{11}$/.test(phone)) {
-      alert("⚠️ يرجى إدخال رقم هاتف مكون من 11 رقمًا بشكل صحيح.");
-      return;
+    // تحديد السعر حسب المرحلة
+    function setPrice() {
+      const stage = document.getElementById("stage").value;
+      const priceDisplay = document.getElementById("price");
+      if (["grade4", "grade5", "grade6"].includes(stage)) {
+        priceDisplay.innerText = "💵 السعر: 50 جنيه مصري";
+      } else if (["prep1", "prep2", "prep3"].includes(stage)) {
+        priceDisplay.innerText = "💵 السعر: 70 جنيه مصري";
+      } else {
+        priceDisplay.innerText = "يرجى اختيار المرحلة";
+      }
     }
 
-    db.ref("users/students/" + phone + "/payment").set({
-      sent: true,
-      sentAt: new Date().toISOString()
-    }).then(() => {
-      document.getElementById("status").innerText = "✅ تم تسجيل إرسال صورة الدفع. يرجى انتظار التفعيل.";
-    }).catch((err) => {
-      alert("❌ حدث خطأ أثناء الإرسال: " + err.message);
-    });
-  }
-
-  // تحقق من التفعيل
-  function checkActivation() {
-    const phone = document.getElementById("phone").value.trim();
-    if (!/^\d{11}$/.test(phone)) {
-      alert("⚠️ رقم الهاتف غير صحيح.");
-      return;
-    }
-
-    db.ref("users/students/" + phone + "/subscription").once("value")
-      .then(snapshot => {
-        const data = snapshot.val();
-        if (data?.active === true) {
-          // سجل وقت التفعيل
-          db.ref("users/students/" + phone + "/subscription/startedAt").set(new Date().toISOString());
-
-          document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
-          setTimeout(() => {
-            window.location.href = "login.html";
-          }, 2000);
-        } else {
-          document.getElementById("status").innerText = "⏳ لم يتم التفعيل بعد، يرجى الانتظار قليلاً.";
+    // إرسال صورة الدفع
+    function markAsSent() {
+      const phone = document.getElementById("phone").value.trim();
+      const stage = document.getElementById("stage").value;
+      
+      if (!/^01\d{9}$/.test(phone)) {
+        alert("⚠️ يرجى إدخال رقم هاتف مكون من 11 رقمًا بشكل صحيح.");
+        return;
+      }
+      
+      if (!stage) {
+        alert("⚠️ يرجى اختيار المرحلة الدراسية أولاً.");
+        return;
+      }
+      
+      // حفظ المرحلة الدراسية وصورة الدفع
+      const updates = {
+        "المرحلة": stage,
+        "payment": {
+          sent: true,
+          sentAt: new Date().toISOString()
         }
-      }).catch((error) => {
-        alert("❌ حدث خطأ في التحقق: " + error.message);
-      });
-  }
-
-  // الانتقال إلى المنصة بعد التفعيل
-  function goToPlatform() {
-    const phone = document.getElementById("phone").value.trim();
-    if (!/^\d{11}$/.test(phone)) {
-      alert("📱 يرجى إدخال رقم الهاتف بشكل صحيح.");
-      return;
+      };
+      
+      db.ref("users/students/" + phone).update(updates)
+        .then(() => {
+          document.getElementById("status").innerText = "✅ تم تسجيل إرسال صورة الدفع. يرجى انتظار التفعيل.";
+          document.getElementById("status").style.color = "#00ffcc";
+          
+          // حفظ رقم الهاتف في localStorage للاستخدام لاحقاً
+          localStorage.setItem('studentPhone', phone);
+        })
+        .catch((err) => {
+          document.getElementById("status").innerText = "❌ حدث خطأ أثناء الإرسال: " + err.message;
+          document.getElementById("status").style.color = "#ff8080";
+        });
     }
 
-    db.ref("users/students/" + phone).once("value")
-      .then(snap => {
-        const data = snap.val();
-        if (data?.subscription?.active) {
-          const stage = data.stage;
-          if (stage) {
-            window.location.href = stage + ".html";
-          } else {
-            alert("⚠️ لم يتم تحديد المرحلة بعد.");
+    // تحقق من التفعيل
+    function checkActivation() {
+      const phone = document.getElementById("phone").value.trim();
+      if (!/^01\d{9}$/.test(phone)) {
+        alert("⚠️ رقم الهاتف غير صحيح.");
+        return;
+      }
+
+      db.ref("users/students/" + phone).once("value")
+        .then(snapshot => {
+          const data = snapshot.val();
+          if (!data) {
+            document.getElementById("status").innerText = "❌ لا يوجد حساب بهذا الرقم";
+            document.getElementById("status").style.color = "#ff8080";
+            return;
           }
-        } else {
-          alert("⛔ لم يتم تفعيل الحساب بعد.");
-        }
-      }).catch((err) => {
-        alert("❌ حدث خطأ أثناء التحقق: " + err.message);
-      });
-  }
 
-  // عرض أو إخفاء الدعم الفني
-  function toggleSupport() {
-    const popup = document.getElementById("support-popup");
-    popup.style.display = popup.style.display === "none" ? "block" : "none";
-  }
+          if (data["اشتراك_مفعل"] === true) {
+            document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
+            document.getElementById("status").style.color = "#00ffcc";
+            
+            // حفظ رقم الهاتف في localStorage
+            localStorage.setItem('studentPhone', phone);
+            
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
+          } else {
+            document.getElementById("status").innerText = "⏳ لم يتم التفعيل بعد، يرجى الانتظار قليلاً.";
+            document.getElementById("status").style.color = "#f1c40f";
+          }
+        })
+        .catch((error) => {
+          document.getElementById("status").innerText = "❌ حدث خطأ في التحقق: " + error.message;
+          document.getElementById("status").style.color = "#ff8080";
+        });
+    }
+
+    // الانتقال إلى المنصة بعد التفعيل
+    function goToPlatform() {
+      const phone = document.getElementById("phone").value.trim();
+      if (!/^01\d{9}$/.test(phone)) {
+        alert("📱 يرجى إدخال رقم الهاتف بشكل صحيح.");
+        return;
+      }
+
+      db.ref("users/students/" + phone).once("value")
+        .then(snap => {
+          const data = snap.val();
+          if (!data) {
+            alert("❌ لا يوجد حساب بهذا الرقم");
+            return;
+          }
+
+          if (data["اشتراك_مفعل"] === true) {
+            const stage = data["المرحلة"];
+            if (stage) {
+              // حفظ رقم الهاتف في localStorage
+              localStorage.setItem('studentPhone', phone);
+              window.location.href = stage + ".html";
+            } else {
+              alert("⚠️ لم يتم تحديد المرحلة الدراسية بعد.");
+            }
+          } else {
+            alert("⛔ لم يتم تفعيل الحساب بعد.");
+          }
+        })
+        .catch((err) => {
+          alert("❌ حدث خطأ أثناء التحقق: " + err.message);
+        });
+    }
+
+    // عرض أو إخفاء الدعم الفني
+    function toggleSupport() {
+      const popup = document.getElementById("support-popup");
+      popup.style.display = popup.style.display === "none" ? "block" : "none";
+    }
+
+    // جلب رقم الهاتف من localStorage إن وجد
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedPhone = localStorage.getItem('studentPhone');
+      if (savedPhone) {
+        document.getElementById('phone').value = savedPhone;
+      }
+    });
   </script>
-  <style>
-  body {
-    font-family: 'Tajawal', sans-serif;
-    background: linear-gradient(135deg, #2f2f2f, #3d3d3d);
-    color: #fff;
-    margin: 0;
-    padding: 2rem 1rem;
-  }
-
-  .container {
-    max-width: 650px;
-    margin: auto;
-    background: #1e1e1e;
-    padding: 2rem;
-    border-radius: 14px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    position: relative;
-  }
-
-  h2 {
-    text-align: center;
-    color: #f1c40f;
-    margin-bottom: 1.5rem;
-    font-size: 1.7rem;
-  }
-
-  label {
-    display: block;
-    margin: 1rem 0 0.3rem;
-    font-weight: bold;
-    color: #eee;
-  }
-
-  select, input {
-    width: 100%;
-    padding: 0.7rem;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    background: #333;
-    color: #fff;
-    margin-bottom: 0.5rem;
-  }
-
-  .highlight {
-    font-size: 1.2rem;
-    color: #2ecc71;
-    text-align: center;
-    margin: 0.7rem 0;
-    font-weight: bold;
-  }
-
-  .box {
-    background: #292929;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-  }
-
-  .box p {
-    margin: 0.4rem 0;
-    font-size: 0.95rem;
-  }
-
-  button {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 0.9rem;
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: #f1c40f;
-    color: #333;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    background-color: #d4ac0d;
-  }
-
-  #status {
-    margin-top: 1rem;
-    font-size: 1rem;
-    text-align: center;
-    color: #00ffcc;
-    min-height: 24px;
-  }
-
-  /* زر الدعم */
-  #support-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: #f1c40f;
-    color: #333;
-    padding: 10px 18px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    z-index: 999;
-    transition: 0.3s;
-  }
-
-  #support-btn:hover {
-    background: #d4ac0d;
-  }
-
-  /* النافذة المنبثقة */
-  #support-popup {
-    position: fixed;
-    bottom: 75px;
-    left: 20px;
-    background: #222;
-    color: #fff;
-    padding: 1.2rem;
-    border-radius: 12px;
-    width: 300px;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    box-shadow: 0 0 8px rgba(0,0,0,0.3);
-    display: none;
-    z-index: 999;
-  }
-
-  #support-popup h4 {
-    margin-top: 0;
-    font-size: 1rem;
-    color: #f1c40f;
-  }
-
-  #support-popup ul {
-    padding-left: 1rem;
-    margin: 0;
-  }
-
-  #support-popup ul li {
-    margin-bottom: 0.5rem;
-    list-style: disc;
-  }
-
-  @media (max-width: 480px) {
-    .container {
-      padding: 1.2rem;
-    }
-
-    button {
-      font-size: 0.95rem;
-    }
-
-    #support-popup {
-      width: 90%;
-      left: 5%;
-    }
-  }
-    </style>
+</body>
+</html>
