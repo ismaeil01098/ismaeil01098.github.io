@@ -20,38 +20,41 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     /* شريط الرأس */
     .header {
-      padding: 1.5rem;
+      padding: 1rem;
       text-align: center;
       background: rgba(0, 0, 0, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 0.5rem;
+      gap: 0.8rem;
+      margin-bottom: 0.3rem;
     }
 
     .logo-icon {
-      font-size: 2.5rem;
+      font-size: 2rem;
       color: #ffdd57;
     }
 
     .logo-text {
-      font-size: 2rem;
+      font-size: 1.6rem;
       font-weight: 800;
     }
 
     .tagline {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       color: #f1c40f;
-      margin-top: 0.5rem;
+      margin-top: 0.3rem;
     }
 
     /* القسم الرئيسي */
@@ -60,9 +63,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 1.5rem;
       position: relative;
       z-index: 1;
+      overflow-y: auto;
     }
 
     .access-container::before {
@@ -82,31 +86,32 @@
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       border-radius: 25px;
-      padding: 3rem;
+      padding: 2rem;
       text-align: center;
       max-width: 600px;
       width: 100%;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      margin: 1rem 0;
     }
 
     .access-title {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
       color: #ffdd57;
     }
 
     .access-description {
-      font-size: 1.4rem;
-      margin-bottom: 2.5rem;
-      line-height: 1.7;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
     }
 
     .buttons-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 2rem;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
     }
 
     .access-btn {
@@ -114,50 +119,53 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.5rem;
+      padding: 1.5rem 1.2rem;
       background: rgba(255, 221, 87, 0.2);
       border-radius: 20px;
       text-decoration: none;
       color: white;
       transition: all 0.4s ease;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 180px;
     }
 
     .access-btn:hover {
       background: rgba(255, 221, 87, 0.3);
-      transform: translateY(-10px);
+      transform: translateY(-8px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .btn-icon {
-      font-size: 3rem;
-      margin-bottom: 1.2rem;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
       color: #ffdd57;
     }
 
     .btn-text {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
     }
 
     .btn-desc {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       opacity: 0.9;
     }
 
     /* الشريط السفلي */
     .footer {
-      padding: 1.5rem;
+      padding: 1rem;
       text-align: center;
       background: rgba(0, 0, 0, 0.6);
-      font-size: 1.1rem;
+      font-size: 0.95rem;
+      position: sticky;
+      bottom: 0;
     }
 
     /* تأثيرات متحركة */
     @keyframes float {
       0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
+      50% { transform: translateY(-10px); }
       100% { transform: translateY(0px); }
     }
 
@@ -172,16 +180,70 @@
       }
       
       .access-title {
-        font-size: 2rem;
+        font-size: 1.6rem;
       }
       
       .access-description {
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
       
       .access-box {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem;
       }
+      
+      .btn-text {
+        font-size: 1.2rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logo-text {
+        font-size: 1.4rem;
+      }
+      
+      .tagline {
+        font-size: 0.85rem;
+      }
+      
+      .access-title {
+        font-size: 1.4rem;
+      }
+      
+      .access-description {
+        font-size: 0.95rem;
+      }
+      
+      .access-btn {
+        padding: 1.2rem;
+        min-height: 160px;
+      }
+      
+      .btn-icon {
+        font-size: 2rem;
+      }
+      
+      .footer {
+        font-size: 0.85rem;
+        padding: 0.8rem;
+      }
+    }
+    
+    /* شريط التمرير */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 221, 87, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 221, 87, 0.7);
     }
   </style>
 </head>
