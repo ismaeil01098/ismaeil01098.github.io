@@ -92,9 +92,12 @@
     appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
   
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const auth = firebase.auth();
+  const db = firebase.database();
 
   function showMessage(msg, success = false) {
     const msgEl = document.getElementById("register-msg");
@@ -110,7 +113,7 @@
     const password = document.getElementById("password").value.trim();
     const confirmPassword = document.getElementById("confirm-password").value.trim();
 
-    // التحقق من صحة البيانات
+    // Validate input
     if (!/^01\d{9}$/.test(phone)) {
       showMessage("📱 رقم الهاتف يجب أن يكون 11 رقمًا ويبدأ بـ 01.");
       return;
@@ -141,34 +144,37 @@
       return;
     }
 
-    // التحقق من عدم وجود حساب بنفس الرقم
-    db.ref("users/students/" + phone).once("value").then(snapshot => {
-      if (snapshot.exists()) {
-        showMessage("📱 يوجد حساب مسجل بهذا الرقم. يرجى تسجيل الدخول.");
-        return;
-      }
-      
-      // إنشاء الحساب
-      const userData = {
-        name: name,
-        stage: stage,
-        governorate: governorate,
-        password: password,
-        registrationDate: new Date().toISOString(),
-        isActive: false,
-        isAdmin: false
-      };
-      
-      db.ref("users/students/" + phone).set(userData)
-        .then(() => {
-          showMessage("✅ تم إنشاء الحساب بنجاح. سيتم توجيهك للدفع...", true);
-          localStorage.setItem('studentPhone', phone);
-          setTimeout(() => window.location.href = "payment.html", 2000);
-        })
-        .catch(error => {
-          showMessage("⚠️ حدث خطأ أثناء إنشاء الحساب: " + error.message);
-        });
-    });
+    // Create user with email and password
+    const email = `${phone}@manssat.com`;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // User created
+        const user = userCredential.user;
+        const userData = {
+          name: name,
+          stage: stage,
+          governorate: governorate,
+          phone: phone,
+          registrationDate: new Date().toISOString(),
+          isActive: false,
+          isAdmin: false
+        };
+        
+        // Save user data to database
+        return db.ref("users/students/" + user.uid).set(userData);
+      })
+      .then(() => {
+        showMessage("✅ تم إنشاء الحساب بنجاح. سيتم توجيهك للدفع...", true);
+        localStorage.setItem('studentPhone', phone);
+        setTimeout(() => window.location.href = "payment.html", 2000);
+      })
+      .catch((error) => {
+        let errorMessage = "⚠️ حدث خطأ أثناء إنشاء الحساب";
+        if (error.code === "auth/email-already-in-use") {
+          errorMessage = "📱 يوجد حساب مسجل بهذا الرقم. يرجى تسجيل الدخول.";
+        }
+        showMessage(errorMessage);
+      });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
