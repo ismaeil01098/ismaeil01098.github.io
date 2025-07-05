@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -212,6 +213,7 @@
     
     // تهيئة Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.database();
 
     // الدخول إلى لوحة التحكم
@@ -219,29 +221,28 @@
       const phone = document.getElementById('admin-phone').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
 
-      // التحقق من صحة رقم الهاتف
-      if (!/^01\d{9}$/.test(phone)) {
-        document.getElementById('pass-error').innerText = 'رقم الهاتف غير صحيح';
-        return;
-      }
-
-      // التحقق من قاعدة البيانات
-      db.ref("users/students/" + phone).once("value").then(snapshot => {
-        const userData = snapshot.val();
-        
-        // التحقق من وجود المستخدم وأنه مدير
-        if (userData && userData.isAdmin === true && userData.password === pass) {
-          // تم التحقق بنجاح
-          document.getElementById('overlay').style.display = 'none';
-          document.getElementById('dashboard').style.display = 'block';
-          showSection('students');
-        } else {
+      // تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور
+      const email = `${phone}@manssat.com`;
+      auth.signInWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+          // التحقق من صلاحيات المدير
+          const user = userCredential.user;
+          return db.ref("users/students/" + user.uid + "/isAdmin").once('value');
+        })
+        .then(snapshot => {
+          if (snapshot.val() === true) {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            showSection('students');
+          } else {
+            alert('ليس لديك صلاحيات مدير');
+            auth.signOut();
+          }
+        })
+        .catch(error => {
           document.getElementById('pass-error').innerText = 
-            'بيانات الدخول غير صحيحة أو ليست صلاحيات مدير';
-        }
-      }).catch(error => {
-        document.getElementById('pass-error').innerText = 'حدث خطأ في الاتصال';
-      });
+            'بيانات الدخول غير صحيحة: ' + error.message;
+        });
     }
 
     // إظهار القسم المحدد
@@ -270,11 +271,11 @@
 
       db.ref("users/students").once("value").then(snapshot => {
         const data = snapshot.val() || {};
-        Object.entries(data).forEach(([phone, student]) => {
+        Object.entries(data).forEach(([userId, student]) => {
           const isActive = student.isActive === true;
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${phone}</td>
+            <td>${student.phone || "-"}</td>
             <td>${student.name || "-"}</td>
             <td>${student.stage || "-"}</td>
             <td>${student.governorate || "-"}</td>
@@ -282,11 +283,11 @@
             <td>${student.registrationDate ? new Date(student.registrationDate).toLocaleDateString('ar-EG') : "-"}</td>
             <td>
               <button class="action ${isActive ? 'inactive-btn' : 'active-btn'}"
-                onclick="toggleActivation('${phone}', ${!isActive})">
+                onclick="toggleActivation('${userId}', ${!isActive})">
                 ${isActive ? 'إلغاء' : 'تفعيل'}
               </button>
               <button class="action delete-btn"
-                onclick="if(confirm('هل تريد حذف هذا الطالب؟')) deleteStudent('${phone}')">
+                onclick="if(confirm('هل تريد حذف هذا الطالب؟')) deleteStudent('${userId}')">
                 حذف
               </button>
             </td>
@@ -300,14 +301,22 @@
     }
 
     // تفعيل/إلغاء تفعيل الطالب
-    function toggleActivation(phone, newState) {
-      db.ref(`users/students/${phone}/isActive`).set(newState)
+    function toggleActivation(userId, newState) {
+      const updates = { isActive: newState };
+      
+      if (newState) {
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + 1);
+        updates.expiryDate = expiryDate.toISOString();
+      }
+      
+      db.ref(`users/students/${userId}`).update(updates)
         .then(() => loadStudents());
     }
 
     // حذف الطالب
-    function deleteStudent(phone) {
-      db.ref(`users/students/${phone}`).remove()
+    function deleteStudent(userId) {
+      db.ref(`users/students/${userId}`).remove()
         .then(() => loadStudents());
     }
 
@@ -432,7 +441,7 @@
         let total = 0, active = 0, today = 0, pending = 0;
         const todayDate = new Date().toISOString().split('T')[0];
 
-        Object.values(data).forEach(user => {
+        Object.entries(data).forEach(([userId, user]) => {
           total++;
           if (user.isActive) active++;
           if (user.registrationDate && user.registrationDate.includes(todayDate)) today++;
