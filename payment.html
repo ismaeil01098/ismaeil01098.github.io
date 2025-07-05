@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
@@ -114,11 +115,11 @@
   <div id="support-popup">
     <h4 style="margin-top:0;">لماذا يوجد رسوم اشتراك؟</h4>
     <ul>
-      <li>تغطية تكاليف تشغيل الخوادم وحماية البيانات.</li>
-      <li>أجور تصوير وتحرير الفيديوهات التعليمية.</li>
-      <li>صيانة المنصة وتطويرها باستمرار.</li>
-      <li>دعم الطلاب من ذوي الاحتياجات الخاصة.</li>
-      <li>تقديم تعليم تفاعلي بجودة عالية ومتابعة شخصية.</li>
+      <li>تغطية تكاليف تشغيل الخوادم وحماية البيانات</li>
+      <li>أجور تصوير وتحرير الفيديوهات التعليمية</li>
+      <li>صيانة المنصة وتطويرها باستمرار</li>
+      <li>دعم الطلاب من ذوي الاحتياجات الخاصة</li>
+      <li>تقديم تعليم تفاعلي بجودة عالية ومتابعة شخصية</li>
     </ul>
     <p style="margin-top:1rem;">📞 للدعم الفني: <b>01011598392</b></p>
   </div>
@@ -134,7 +135,11 @@
       appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
     const db = firebase.database();
 
     function setPrice() {
@@ -163,15 +168,27 @@
         return;
       }
       
-      const updates = {
-        stage: stage,
-        payment: {
-          sent: true,
-          sentAt: new Date().toISOString()
-        }
-      };
-      
-      db.ref("users/students/" + phone).update(updates)
+      // Find user by phone number
+      db.ref("users/students").orderByChild("phone").equalTo(phone).once("value")
+        .then(snapshot => {
+          if (!snapshot.exists()) {
+            alert("❌ لا يوجد حساب بهذا الرقم");
+            return;
+          }
+          
+          const userData = Object.values(snapshot.val())[0];
+          const userId = Object.keys(snapshot.val())[0];
+          
+          const updates = {
+            stage: stage,
+            payment: {
+              sent: true,
+              sentAt: new Date().toISOString()
+            }
+          };
+          
+          return db.ref("users/students/" + userId).update(updates);
+        })
         .then(() => {
           document.getElementById("status").innerText = "✅ تم تسجيل إرسال صورة الدفع. يرجى انتظار التفعيل.";
           document.getElementById("status").style.color = "#00ffcc";
@@ -190,16 +207,19 @@
         return;
       }
 
-      db.ref("users/students/" + phone).once("value")
+      // Find user by phone number
+      db.ref("users/students").orderByChild("phone").equalTo(phone).once("value")
         .then(snapshot => {
-          const data = snapshot.val();
-          if (!data) {
+          if (!snapshot.exists()) {
             document.getElementById("status").innerText = "❌ لا يوجد حساب بهذا الرقم";
             document.getElementById("status").style.color = "#ff8080";
             return;
           }
-
-          if (data.isActive === true) {
+          
+          const userData = Object.values(snapshot.val())[0];
+          const userId = Object.keys(snapshot.val())[0];
+          
+          if (userData.isActive === true) {
             document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
             document.getElementById("status").style.color = "#00ffcc";
             localStorage.setItem('studentPhone', phone);
@@ -222,16 +242,19 @@
         return;
       }
 
-      db.ref("users/students/" + phone).once("value")
-        .then(snap => {
-          const data = snap.val();
-          if (!data) {
+      // Find user by phone number
+      db.ref("users/students").orderByChild("phone").equalTo(phone).once("value")
+        .then(snapshot => {
+          if (!snapshot.exists()) {
             alert("❌ لا يوجد حساب بهذا الرقم");
             return;
           }
-
-          if (data.isActive === true) {
-            const stage = data.stage;
+          
+          const userData = Object.values(snapshot.val())[0];
+          const userId = Object.keys(snapshot.val())[0];
+          
+          if (userData.isActive === true) {
+            const stage = userData.stage;
             if (stage) {
               localStorage.setItem('studentPhone', phone);
               window.location.href = stage + ".html";
