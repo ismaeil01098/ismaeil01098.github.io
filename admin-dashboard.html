@@ -4,111 +4,488 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>لوحة التحكم - منصة العلوم</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Tajawal', sans-serif; background: #1e1e1e; color: #fff; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Tajawal', sans-serif; background: #1e1e1e; color: #fff; }
+    
+    /* Overlay (login) */
     .overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); display: flex;
-      align-items: center; justify-content: center; z-index: 1000;
+      background: linear-gradient(135deg, #1a1a1a, #2c2c2c); 
+      display: flex; align-items: center; justify-content: center; 
+      z-index: 1000;
     }
-    .password-box {
-      background: #fff; padding: 1.5rem; border-radius: 10px;
-      width: 90%; max-width: 320px; text-align: center;
+    .login-container {
+      background: #242424; 
+      padding: 2.5rem; 
+      border-radius: 15px;
+      width: 90%; 
+      max-width: 420px; 
+      text-align: center; 
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 1px solid #3a3a3a;
     }
-    .password-box input {
-      width: 100%; padding: 0.7rem; margin-top: 0.5rem;
-      border: 1px solid #ccc; border-radius: 5px; font-size: 1rem;
+    .login-container h2 {
+      color: #b6a564;
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+      font-size: 1.8rem;
     }
-    .password-box button {
-      margin-top: 1rem; padding: 0.7rem 1rem;
-      background: #b6a564; color: #fff; border: none;
-      border-radius: 5px; font-size: 1rem; cursor: pointer;
+    .login-container .logo {
+      width: 80px;
+      height: 80px;
+      background: #b6a564;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
     }
-    .password-box .error { color: red; margin-top: 0.6rem; }
+    .input-group {
+      margin-bottom: 1.2rem;
+      text-align: right;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #b6a564;
+      font-weight: 500;
+    }
+    .input-group input {
+      width: 100%; 
+      padding: 0.9rem 1rem;
+      background: #2c2c2c;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px; 
+      font-size: 1rem;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+    .input-group input:focus {
+      border-color: #b6a564;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(182, 165, 100, 0.3);
+    }
+    .input-group input::placeholder {
+      color: #888;
+    }
+    .login-container button {
+      margin-top: 1rem; 
+      padding: 0.9rem 1.5rem;
+      background: #b6a564; 
+      color: #1e1e1e; 
+      border: none;
+      border-radius: 8px; 
+      font-size: 1.1rem; 
+      cursor: pointer;
+      font-weight: 700;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+    .login-container button:hover {
+      background: #c8b87a;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(182, 165, 100, 0.4);
+    }
+    .login-container .error {
+      color: #ff6b6b;
+      margin-top: 1rem;
+      min-height: 1.5rem;
+      font-weight: 500;
+    }
+    .login-footer {
+      margin-top: 1.5rem;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Dashboard wrapper */
+    #dashboard { 
+      display: none; 
+      min-height: 100vh; 
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(to right, #1a1a1a, #24221e);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #b6a564;
+    }
+    .header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .header .logo-icon {
+      background: #b6a564;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .header .logo-text {
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: #b6a564;
+    }
+    .header .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .header .admin-name {
+      font-weight: 700;
+    }
+    .header .logout-btn {
+      background: #3a3a3a;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .header .logout-btn:hover {
+      background: #ff6b6b;
+    }
+
+    /* Top navigation */
     .topnav {
-      display: flex; flex-wrap: wrap; justify-content: center;
-      gap: 0.6rem; background: #24221e; color: #fff;
-      padding: 0.7rem 0; font-size: 0.95rem;
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center;
+      gap: 0.8rem; 
+      background: #24221e; 
+      padding: 1rem 0;
+      border-bottom: 1px solid #3a3a3a;
     }
     .topnav div {
-      cursor: pointer; padding: 0.4rem 1.2rem;
-      border-radius: 20px; background: #b6a564; color: #fff;
-      transition: 0.3s;
+      cursor: pointer; 
+      padding: 0.7rem 1.5rem;
+      border-radius: 30px; 
+      background: #2c2c2c; 
+      color: #aaa;
+      font-weight: bold; 
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid transparent;
     }
-    .topnav div.active { background: #3ab54a; }
-    .main { padding: 1rem; max-width: 1000px; margin: auto; }
-    section { display: none; margin-top: 1.5rem; }
+    .topnav div:hover {
+      background: #3a3a3a;
+      color: #fff;
+    }
+    .topnav div.active { 
+      background: #3ab54a; 
+      color: #fff;
+      border-color: #b6a564;
+    }
+
+    /* Main content area */
+    .main {
+      padding: 1.5rem; 
+      max-width: 1200px; 
+      margin: 1.5rem auto;
+    }
+    section { 
+      display: none; 
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     section.active { display: block; }
-    .form-group { margin: 1rem 0; }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 0.6rem; border-radius: 5px;
-      border: 1px solid #ccc; font-size: 1rem;
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: #b6a564;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #3a3a3a;
     }
-    .loader { text-align: center; margin: 1rem 0; color: #999; }
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
-    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: center; }
-    th { background-color: #b6a564; color: #fff; }
+    
+    /* Common components */
+    .form-group {
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #b6a564;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+      width: 100%; 
+      padding: 0.9rem 1rem;
+      background: #2c2c2c;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px; 
+      font-size: 1rem;
+      color: #fff;
+      font-family: 'Tajawal', sans-serif;
+      transition: all 0.3s;
+    }
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+      border-color: #b6a564;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(182, 165, 100, 0.3);
+    }
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
     .action {
-      padding: 0.4rem 0.6rem; border: none;
-      border-radius: 4px; cursor: pointer; font-size: 0.85rem;
-      margin: 0 2px;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    .active-btn { background: #3ab54a; color: white; }
-    .inactive-btn { background: #e74c3c; color: white; }
-    .delete-btn { background: #7f8c8d; color: white; }
-    .chart-container { max-width: 600px; margin: 2rem auto; }
+    .action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .active-btn { 
+      background: #3ab54a; 
+      color: white; 
+    }
+    .active-btn:hover {
+      background: #2da03d;
+    }
+    .inactive-btn { 
+      background: #f44336; 
+      color: white; 
+    }
+    .inactive-btn:hover {
+      background: #e53935;
+    }
+    .delete-btn { 
+      background: #f44336; 
+      color: white; 
+    }
+    .delete-btn:hover {
+      background: #e53935;
+    }
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .loader {
+      text-align: center;
+      padding: 2rem;
+      font-weight: bold;
+      color: #b6a564;
+      font-size: 1.2rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #2c2c2c;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      border-left: 4px solid #b6a564;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .stat-card .number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #b6a564;
+      margin: 0.5rem 0;
+    }
+    .stat-card .label {
+      font-size: 1.1rem;
+      color: #aaa;
+    }
+    
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #3a3a3a;
+      margin-top: 1.5rem;
+      background: #2c2c2c;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    table {
+      width: 100%; 
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #3a3a3a;
+    }
+    th {
+      background: #1a1a1a;
+      color: #b6a564;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    tr:nth-child(even) {
+      background: #242424;
+    }
+    tr:hover {
+      background: #333;
+    }
+    .action-cell {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    
+    /* Charts */
+    .chart-container {
+      background: #2c2c2c;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 1.5rem;
+      }
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .topnav div {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+      .main {
+        padding: 1rem;
+      }
+      .section-title {
+        font-size: 1.5rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- 1) Auth Overlay -->
   <div id="overlay" class="overlay">
-    <div class="password-box">
-      <h3>أدخل بيانات المدير</h3>
-      <input type="text" id="admin-phone" placeholder="📱 رقم الهاتف" maxlength="11" />
-      <input type="password" id="admin-pass" placeholder="🔒 كلمة المرور" />
-      <button onclick="checkPassword()">دخول</button>
+    <div class="login-container">
+      <div class="logo">⚗️</div>
+      <h2>لوحة تحكم منصة العلوم</h2>
+      <div class="input-group">
+        <label for="admin-phone">رقم الهاتف</label>
+        <input type="text" id="admin-phone" placeholder="أدخل رقم الهاتف" maxlength="11" />
+      </div>
+      <div class="input-group">
+        <label for="admin-pass">كلمة المرور</label>
+        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور" />
+      </div>
+      <button onclick="checkPassword()">دخول إلى لوحة التحكم</button>
       <div id="pass-error" class="error"></div>
+      <div class="login-footer">
+        منصة العلوم © 2024 - جميع الحقوق محفوظة
+      </div>
     </div>
   </div>
 
-  <div id="dashboard" style="display:none;">
+  <!-- 2) Dashboard Base Layout -->
+  <div id="dashboard">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">⚗️</div>
+        <div class="logo-text">منصة العلوم</div>
+      </div>
+      <div class="admin-info">
+        <div class="admin-name">مرحباً، المدير</div>
+        <div class="logout-btn" onclick="logout()">تسجيل الخروج</div>
+      </div>
+    </div>
+    
     <div class="topnav">
-      <div id="tab-stu" class="active" onclick="showSection('students')">👥 الطلاب</div>
-      <div id="tab-con" onclick="showSection('content')">📁 المحتوى</div>
-      <div id="tab-ann" onclick="showSection('announce')">🔔 الإعلانات</div>
-      <div id="tab-stat" onclick="showSection('stats')">📊 الإحصائيات</div>
+      <div id="tab-stu" class="active" onclick="showSection('students')">
+        <span>👥</span> الطلاب
+      </div>
+      <div id="tab-con" onclick="showSection('content')">
+        <span>📁</span> المحتوى
+      </div>
+      <div id="tab-ann" onclick="showSection('announce')">
+        <span>🔔</span> الإعلانات
+      </div>
+      <div id="tab-stat" onclick="showSection('stats')">
+        <span>📊</span> الإحصائيات
+      </div>
     </div>
     
     <div class="main">
+      <!-- Students Section -->
       <section id="students" class="active">
-        <h2>قائمة الطلاب</h2>
+        <h2 class="section-title">👥 إدارة الطلاب</h2>
         <div class="form-group">
           <input type="text" id="student-search" placeholder="🔍 ابحث بالاسم أو الهاتف" oninput="filterStudents()" />
         </div>
-        <div id="loader-stu" class="loader">جاري التحميل…</div>
-        <table id="tbl-stu" style="display:none;">
-          <thead>
-            <tr>
-              <th>📞 الهاتف</th>
-              <th>👤 الاسم</th>
-              <th>🎓 المرحلة</th>
-              <th>📍 المحافظة</th>
-              <th>✅ مفعل؟</th>
-              <th>🕓 التسجيل</th>
-              <th>🛠️ الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div id="loader-stu" class="loader">جاري تحميل بيانات الطلاب...</div>
+        <div class="table-container">
+          <table id="tbl-stu" style="display:none;">
+            <thead>
+              <tr>
+                <th>📞 الهاتف</th>
+                <th>👤 الاسم</th>
+                <th>🎓 المرحلة</th>
+                <th>📍 المحافظة</th>
+                <th>✅ الحالة</th>
+                <th>🕓 التسجيل</th>
+                <th>🛠️ الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
-
+      
+      <!-- Content Section -->
       <section id="content">
-        <h2>📁 إدارة المحتوى</h2>
+        <h2 class="section-title">📁 إدارة المحتوى التعليمي</h2>
         <div class="form-group">
           <label>المرحلة الدراسية</label>
           <select id="content-stage">
@@ -124,9 +501,9 @@
         <div class="form-group">
           <label>نوع المحتوى</label>
           <select id="content-type">
-            <option value="video">🎥 فيديو</option>
-            <option value="file">📄 ملف</option>
-            <option value="quiz">📝 اختبار</option>
+            <option value="videos">🎥 فيديو تعليمي</option>
+            <option value="notes">📄 ملاحظات وملخصات</option>
+            <option value="exams">📝 اختبارات وتدريبات</option>
           </select>
         </div>
         <div class="form-group">
@@ -135,27 +512,31 @@
         </div>
         <div class="form-group">
           <label>رابط المحتوى</label>
-          <input type="text" id="content-url" placeholder="مثال: https://..." />
+          <input type="text" id="content-url" placeholder="مثال: https://youtube.com/..." />
         </div>
-        <button class="action active-btn" onclick="submitContent()">➕ إضافة</button>
-        <div id="loader-con" class="loader">جاري تحميل المحتوى...</div>
-        <table id="tbl-con" style="display:none;">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>مرحلة</th>
-              <th>نوع</th>
-              <th>العنوان</th>
-              <th>الرابط</th>
-              <th>❌ حذف</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <button class="action active-btn" onclick="submitContent()">➕ إضافة محتوى جديد</button>
+        
+        <div id="loader-con" class="loader">جاري تحميل المحتوى التعليمي...</div>
+        <div class="table-container">
+          <table id="tbl-con" style="display:none; margin-top:1.5rem;">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>مرحلة</th>
+                <th>نوع</th>
+                <th>العنوان</th>
+                <th>الرابط</th>
+                <th>❌ حذف</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
-
+      
+      <!-- Announcements Section -->
       <section id="announce">
-        <h2>🔔 إدارة الإعلانات</h2>
+        <h2 class="section-title">🔔 إدارة الإعلانات</h2>
         <div class="form-group">
           <label>المرحلة المستهدفة</label>
           <select id="ann-stage">
@@ -166,40 +547,70 @@
             <option value="prep1">الأول الإعدادي</option>
             <option value="prep2">الثاني الإعدادي</option>
             <option value="prep3">الثالث الإعدادي</option>
+            <option value="all">جميع المراحل</option>
           </select>
         </div>
         <div class="form-group">
           <label>نص الإعلان</label>
-          <textarea id="ann-text" rows="3" placeholder="اكتب هنا نص الإعلان..."></textarea>
+          <textarea id="ann-text" placeholder="اكتب هنا نص الإعلان الذي سيتم إرساله للطلاب..."></textarea>
         </div>
-        <button class="action active-btn" onclick="addAnnouncement()">➕ نشر</button>
-        <div id="loader-ann" class="loader">⏳ جاري تحميل الإعلانات...</div>
-        <table id="tbl-ann" style="display:none;">
-          <thead>
-            <tr>
-              <th>المرحلة</th>
-              <th>نص الإعلان</th>
-              <th>🗑️ حذف</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <button class="action active-btn" onclick="addAnnouncement()">➕ نشر إعلان جديد</button>
+        
+        <div id="loader-ann" class="loader">جاري تحميل الإعلانات...</div>
+        <div class="table-container">
+          <table id="tbl-ann" style="display:none; margin-top:1.5rem;">
+            <thead>
+              <tr>
+                <th>المرحلة</th>
+                <th>نص الإعلان</th>
+                <th>🗑️ حذف</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
-
+      
+      <!-- Statistics Section -->
       <section id="stats">
-        <h2>📊 إحصائيات المنصة</h2>
+        <h2 class="section-title">📊 إحصائيات المنصة</h2>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">إجمالي الطلاب</div>
+            <div class="number" id="cntAll">0</div>
+            <div class="desc">جميع الطلاب المسجلين</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">المشتركون المفعلون</div>
+            <div class="number" id="cntActive">0</div>
+            <div class="desc">طلاب نشطون حالياً</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">طلاب جدد اليوم</div>
+            <div class="number" id="cntToday">0</div>
+            <div class="desc">مسجلون خلال 24 ساعة</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">بانتظار التفعيل</div>
+            <div class="number" id="cntPending">0</div>
+            <div class="desc">طلاب بانتظار تفعيل الاشتراك</div>
+          </div>
+        </div>
+        
         <div class="chart-container">
           <canvas id="chartStages"></canvas>
         </div>
-        <p>📌 إجمالي الطلاب: <span id="cntAll">0</span></p>
-        <p>✅ مشتركون مفعلون: <span id="cntActive">0</span></p>
-        <p>📆 طلاب جدد اليوم: <span id="cntToday">0</span></p>
-        <p>💳 طلاب بانتظار التفعيل: <span id="cntPending">0</span></p>
       </section>
     </div>
   </div>
-  
+
+  <!-- Firebase & Utilities -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
+    // 1) Firebase Initialization
     const firebaseConfig = {
       apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
       authDomain: "manssat-science.firebaseapp.com",
@@ -212,187 +623,72 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
+    const stageNames = {
+      "grade4": "الصف الرابع",
+      "grade5": "الصف الخامس",
+      "grade6": "الصف السادس",
+      "prep1": "الأول الإعدادي",
+      "prep2": "الثاني الإعدادي",
+      "prep3": "الثالث الإعدادي",
+      "all": "جميع المراحل"
+    };
+    const contentTypeNames = {
+      "videos": "فيديو تعليمي",
+      "notes": "ملاحظات وملخصات",
+      "exams": "اختبارات وتدريبات"
+    };
 
+    // 2) Auth check
     function checkPassword() {
       const phone = document.getElementById('admin-phone').value.trim();
-      const pass = document.getElementById('admin-pass').value.trim();
+      const pass  = document.getElementById('admin-pass').value.trim();
+      const error = document.getElementById('pass-error');
+      
+      if (!phone || !pass) {
+        error.innerText = 'يرجى إدخال رقم الهاتف وكلمة المرور';
+        return;
+      }
+      
       const email = `${phone}@manssat.com`;
+      error.innerText = '';
+      
       auth.signInWithEmailAndPassword(email, pass)
-        .then(userCred => db.ref("users/students/" + userCred.user.uid + "/isAdmin").once('value'))
+        .then(userCred => db.ref(`users/students/${userCred.user.uid}/isAdmin`).once('value'))
         .then(snap => {
           if (snap.val() === true) {
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
+            document.querySelector('.admin-name').innerText = `مرحباً، ${phone}`;
             showSection('students');
           } else {
-            alert('ليس لديك صلاحيات مدير');
+            error.innerText = 'ليس لديك صلاحيات مدير';
             auth.signOut();
           }
         })
-        .catch(err => document.getElementById('pass-error').innerText = 'بيانات الدخول غير صحيحة: ' + err.message);
+        .catch(err => {
+          console.error(err);
+          error.innerText = 'خطأ في بيانات الدخول. يرجى المحاولة مرة أخرى';
+        });
+    }
+    
+    // 3) Logout
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('admin-pass').value = '';
+        document.getElementById('pass-error').innerText = '';
+      });
     }
 
+    // 4) Section switcher
     function showSection(id) {
       ['students','content','announce','stats'].forEach(sec => {
         document.getElementById(sec).classList.toggle('active', sec === id);
         document.getElementById('tab-' + sec.slice(0,3)).classList.toggle('active', sec === id);
       });
-      if (id === 'students') loadStudents();
-      if (id === 'content') loadContent();
-      if (id === 'announce') loadAnnouncements();
-      if (id === 'stats') loadStats();
-    }
-
-    function loadStudents() {
-      document.getElementById("loader-stu").style.display = "block";
-      const table = document.getElementById("tbl-stu"), tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
-      db.ref("users/students").once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        Object.entries(data).forEach(([userId, student]) => {
-          const isActive = student.isActive === true;
-          const regDateObj = new Date(student.registrationDate);
-          const regDate = (student.registrationDate && !isNaN(regDateObj)) ? regDateObj.toLocaleDateString('ar-EG') : "—";
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${student.phone || "—"}</td>
-            <td>${student.name || "—"}</td>
-            <td>${student.stage || "—"}</td>
-            <td>${student.governorate || "—"}</td>
-            <td>${isActive ? "✅" : "❌"}</td>
-            <td>${regDate}</td>
-            <td>
-              <button class="action ${isActive ? 'inactive-btn' : 'active-btn'}" onclick="toggleActivation('${userId}', ${!isActive})">
-                ${isActive ? 'إلغاء' : 'تفعيل'}
-              </button>
-              <button class="action delete-btn" onclick="if(confirm('هل تريد حذف هذا الطالب؟')) deleteStudent('${userId}')">
-                حذف
-              </button>
-            </td>`;
-          tbody.appendChild(row);
-        });
-      }).finally(() => {
-        document.getElementById("loader-stu").style.display = "none";
-        table.style.display = "table";
-      });
-    }
-
-    function toggleActivation(userId, newState) {
-      const updates = { isActive: newState };
-      if (newState) {
-        const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 1);
-        updates.subscriptionEnd = expiry.toISOString();
-      }
-      db.ref(`users/students/${userId}`).update(updates).then(loadStudents);
-    }
-
-    function deleteStudent(userId) {
-      db.ref(`users/students/${userId}`).remove().then(loadStudents);
-    }
-
-    function submitContent() {
-      const stage = document.getElementById("content-stage").value,
-            type  = document.getElementById("content-type").value,
-            title = document.getElementById("content-title").value.trim(),
-            url   = document.getElementById("content-url").value.trim();
-      if (!stage || !type || !title || !url) return alert("من فضلك املأ كل الحقول المطلوبة.");
-      const id = Date.now();
-      db.ref(`content/${stage}/${type}s/${id}`).set({ type, title, url, createdAt: new Date().toISOString() })
-        .then(() => { document.getElementById("content-title").value = ""; document.getElementById("content-url").value = ""; loadContent(); });
-    }
-
-    function loadContent() {
-      document.getElementById("loader-con").style.display = "block";
-      const table = document.getElementById("tbl-con"), tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
-      db.ref("content").once("value").then(snapshot => {
-        snapshot.forEach(stageSnap => {
-          stageSnap.forEach(typeSnap => {
-            typeSnap.forEach(itemSnap => {
-              const item = itemSnap.val();
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                <td>${itemSnap.key}</td>
-                <td>${stageSnap.key}</td>
-                <td>${item.type}</td>
-                <td>${item.title}</td>
-                <td><a href="${item.url}" target="_blank">🔗 فتح</a></td>
-                <td><button class="action delete-btn" onclick="deleteContent('${stageSnap.key}','${typeSnap.key}','${itemSnap.key}')">حذف</button></td>`;
-              tbody.appendChild(row);
-            });
-          });
-        });
-      }).finally(() => {
-        document.getElementById("loader-con").style.display = "none";
-        table.style.display = "table";
-      });
-    }
-
-    function deleteContent(stage, type, id) {
-      db.ref(`content/${stage}/${type}s/${id}`).remove().then(loadContent);
-    }
-
-    function addAnnouncement() {
-      const stage = document.getElementById("ann-stage").value,
-            text  = document.getElementById("ann-text").value.trim();
-      if (!stage || !text) return alert("يرجى إدخال المرحلة ونص الإعلان.");
-      db.ref(`announcements/${stage}`).set({ text, updatedAt: new Date().toISOString() }).then(loadAnnouncements);
-    }
-
-    function loadAnnouncements() {
-      document.getElementById("loader-ann").style.display = "block";
-      const table = document.getElementById("tbl-ann"), tbody = table.querySelector("tbody");
-      tbody.innerHTML = "";
-      db.ref("announcements").once("value").then(snapshot => {
-        Object.entries(snapshot.val()||{}).forEach(([stage, ann]) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${stage}</td>
-            <td>${ann.text}</td>
-            <td><button class="action delete-btn" onclick="deleteAnnouncement('${stage}')">حذف</button></td>`;
-          tbody.appendChild(row);
-        });
-      }).finally(() => {
-        document.getElementById("loader-ann").style.display = "none";
-        table.style.display = "table";
-      });
-    }
-
-    function deleteAnnouncement(stage) {
-      db.ref(`announcements/${stage}`).remove().then(loadAnnouncements);
-    }
-
-    let chart;
-    function loadStats() {
-      db.ref('users/students').once('value').then(snapshot => {
-        const data = snapshot.val()||{}, counts={grade4:0,grade5:0,grade6:0,prep1:0,prep2:0,prep3:0};
-        let total=0,active=0,today=0,pending=0;
-        const todayKey = new Date().toISOString().split('T')[0];
-        Object.values(data).forEach(u => {
-          total++;
-          if (u.isActive) active++;
-          if (u.registrationDate && u.registrationDate.includes(todayKey)) today++;
-          if (!u.isActive && u.payment && u.payment.sent) pending++;
-          if (counts[u.stage] !== undefined) counts[u.stage]++;
-        });
-        document.getElementById("cntAll").innerText = total;
-        document.getElementById("cntActive").innerText = active;
-        document.getElementById("cntToday").innerText = today;
-        document.getElementById("cntPending").innerText = pending;
-        const ctx = document.getElementById("chartStages").getContext("2d");
-        if (chart) chart.destroy();
-        chart = new Chart(ctx,{
-          type:"bar",
-          data:{ labels:["رابع","خامس","سادس","أولى إعدادى","ثانية إعدادى","ثالثة إعدادى"],
-            datasets:[{ label:"عدد الطلاب", data:Object.values(counts), backgroundColor:"#3ab54a", borderRadius:5 }]},
-          options:{ responsive:true, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
-        });
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('dashboard').style.display = 'none';
-    });
-  </script>
-</body>
-</html>
+      
+      // Load section data when activated
+      if (id === 'students') fetchStudents();
+      if (id === 'content') fetchContent();
+      if (id === 'announce') fe
