@@ -377,15 +377,23 @@
 
     // جلب الإعلانات من قاعدة البيانات
     function loadAnnouncements() {
-      db.ref("announcements").once("value").then(snapshot => {
-        const announcements = snapshot.val();
-        if (announcements && announcements.grade4) {
-          const announcementText = announcements.grade4.join(' • ');
-          document.getElementById("announcement").innerText = announcementText;
+      // استخدام المسار الصحيح مع حالة أحرف صغيرة
+      const ref = db.ref("settings/announcements/grade4");
+      
+      // استخدام onValue() بدلاً من once() للتحديث التلقائي
+      ref.on("value", (snapshot) => {
+        const announcementData = snapshot.val();
+        
+        if (announcementData && announcementData.text) {
+          document.getElementById("announcement").innerText = announcementData.text;
+        } else {
+          document.getElementById("announcement").innerText = 
+            "مرحباً بطلاب الصف الرابع! يمكنكم الآن الوصول للمحتوى التعليمي 💡";
         }
-      }).catch(error => {
+      }, (error) => {
         console.error("حدث خطأ في جلب الإعلانات:", error);
-        document.getElementById("announcement").innerText = "مرحباً بطلاب الصف الرابع! يمكنكم الآن الوصول للمحتوى التعليمي 💡";
+        document.getElementById("announcement").innerText = 
+          "مرحباً بطلاب الصف الرابع! نتمنى لكم عاماً دراسياً مميزاً مع منصة العلوم 💡";
       });
     }
 
