@@ -200,7 +200,6 @@
   </div>
   
   <script>
-    // التهيئة
     const firebaseConfig = {
       apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
       authDomain: "manssat-science.firebaseapp.com",
@@ -210,27 +209,18 @@
       messagingSenderId: "22539678455",
       appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
     };
-    
-    // تهيئة Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // الدخول إلى لوحة التحكم
     function checkPassword() {
       const phone = document.getElementById('admin-phone').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
-
-      // تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور
       const email = `${phone}@manssat.com`;
       auth.signInWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-          // التحقق من صلاحيات المدير
-          const user = userCredential.user;
-          return db.ref("users/students/" + user.uid + "/isAdmin").once('value');
-        })
-        .then(snapshot => {
-          if (snapshot.val() === true) {
+        .then(userCred => db.ref("users/students/" + userCred.user.uid + "/isAdmin").once('value'))
+        .then(snap => {
+          if (snap.val() === true) {
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             showSection('students');
@@ -239,59 +229,46 @@
             auth.signOut();
           }
         })
-        .catch(error => {
-          document.getElementById('pass-error').innerText = 
-            'بيانات الدخول غير صحيحة: ' + error.message;
-        });
+        .catch(err => document.getElementById('pass-error').innerText = 'بيانات الدخول غير صحيحة: ' + err.message);
     }
 
-    // إظهار القسم المحدد
     function showSection(id) {
-      const sections = ['students', 'content', 'announce', 'stats'];
-      sections.forEach(sec => {
-        const sectionEl = document.getElementById(sec);
-        const tabEl = document.getElementById('tab-' + sec.slice(0,3));
-        
-        if (sectionEl) sectionEl.classList.toggle('active', sec === id);
-        if (tabEl) tabEl.classList.toggle('active', sec === id);
+      ['students','content','announce','stats'].forEach(sec => {
+        document.getElementById(sec).classList.toggle('active', sec === id);
+        document.getElementById('tab-' + sec.slice(0,3)).classList.toggle('active', sec === id);
       });
-      
       if (id === 'students') loadStudents();
-      else if (id === 'content') loadContent();
-      else if (id === 'announce') loadAnnouncements();
-      else if (id === 'stats') loadStats();
+      if (id === 'content') loadContent();
+      if (id === 'announce') loadAnnouncements();
+      if (id === 'stats') loadStats();
     }
 
-    // تحميل بيانات الطلاب
     function loadStudents() {
       document.getElementById("loader-stu").style.display = "block";
-      const table = document.getElementById("tbl-stu");
-      const tbody = table.querySelector("tbody");
+      const table = document.getElementById("tbl-stu"), tbody = table.querySelector("tbody");
       tbody.innerHTML = "";
-
       db.ref("users/students").once("value").then(snapshot => {
         const data = snapshot.val() || {};
         Object.entries(data).forEach(([userId, student]) => {
           const isActive = student.isActive === true;
+          const regDateObj = new Date(student.registrationDate);
+          const regDate = (student.registrationDate && !isNaN(regDateObj)) ? regDateObj.toLocaleDateString('ar-EG') : "—";
           const row = document.createElement("tr");
           row.innerHTML = `
-            <td>${student.phone || "-"}</td>
-            <td>${student.name || "-"}</td>
-            <td>${student.stage || "-"}</td>
-            <td>${student.governorate || "-"}</td>
+            <td>${student.phone || "—"}</td>
+            <td>${student.name || "—"}</td>
+            <td>${student.stage || "—"}</td>
+            <td>${student.governorate || "—"}</td>
             <td>${isActive ? "✅" : "❌"}</td>
-            <td>${student.registrationDate ? new Date(student.registrationDate).toLocaleDateString('ar-EG') : "-"}</td>
+            <td>${regDate}</td>
             <td>
-              <button class="action ${isActive ? 'inactive-btn' : 'active-btn'}"
-                onclick="toggleActivation('${userId}', ${!isActive})">
+              <button class="action ${isActive ? 'inactive-btn' : 'active-btn'}" onclick="toggleActivation('${userId}', ${!isActive})">
                 ${isActive ? 'إلغاء' : 'تفعيل'}
               </button>
-              <button class="action delete-btn"
-                onclick="if(confirm('هل تريد حذف هذا الطالب؟')) deleteStudent('${userId}')">
+              <button class="action delete-btn" onclick="if(confirm('هل تريد حذف هذا الطالب؟')) deleteStudent('${userId}')">
                 حذف
               </button>
-            </td>
-          `;
+            </td>`;
           tbody.appendChild(row);
         });
       }).finally(() => {
@@ -300,73 +277,47 @@
       });
     }
 
-    // تفعيل/إلغاء تفعيل الطالب
     function toggleActivation(userId, newState) {
       const updates = { isActive: newState };
-      
       if (newState) {
-        const expiryDate = new Date();
-        expiryDate.setMonth(expiryDate.getMonth() + 1);
-        updates.expiryDate = expiryDate.toISOString();
+        const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 1);
+        updates.subscriptionEnd = expiry.toISOString();
       }
-      
-      db.ref(`users/students/${userId}`).update(updates)
-        .then(() => loadStudents());
+      db.ref(`users/students/${userId}`).update(updates).then(loadStudents);
     }
 
-    // حذف الطالب
     function deleteStudent(userId) {
-      db.ref(`users/students/${userId}`).remove()
-        .then(() => loadStudents());
+      db.ref(`users/students/${userId}`).remove().then(loadStudents);
     }
 
-    // إضافة محتوى جديد
     function submitContent() {
-      const stage = document.getElementById("content-stage").value;
-      const type = document.getElementById("content-type").value;
-      const title = document.getElementById("content-title").value.trim();
-      const url = document.getElementById("content-url").value.trim();
-
-      if (!stage || !type || !title || !url) {
-        alert("من فضلك املأ كل الحقول المطلوبة.");
-        return;
-      }
-
+      const stage = document.getElementById("content-stage").value,
+            type  = document.getElementById("content-type").value,
+            title = document.getElementById("content-title").value.trim(),
+            url   = document.getElementById("content-url").value.trim();
+      if (!stage || !type || !title || !url) return alert("من فضلك املأ كل الحقول المطلوبة.");
       const id = Date.now();
-      const contentData = { type, title, url, createdAt: new Date().toISOString() };
-      
-      db.ref(`content/${stage}/${type}s/${id}`).set(contentData)
-        .then(() => {
-          document.getElementById("content-title").value = "";
-          document.getElementById("content-url").value = "";
-          loadContent();
-        });
+      db.ref(`content/${stage}/${type}s/${id}`).set({ type, title, url, createdAt: new Date().toISOString() })
+        .then(() => { document.getElementById("content-title").value = ""; document.getElementById("content-url").value = ""; loadContent(); });
     }
 
-    // تحميل المحتوى
     function loadContent() {
       document.getElementById("loader-con").style.display = "block";
-      const table = document.getElementById("tbl-con");
-      const tbody = table.querySelector("tbody");
+      const table = document.getElementById("tbl-con"), tbody = table.querySelector("tbody");
       tbody.innerHTML = "";
-
       db.ref("content").once("value").then(snapshot => {
         snapshot.forEach(stageSnap => {
-          const stage = stageSnap.key;
           stageSnap.forEach(typeSnap => {
             typeSnap.forEach(itemSnap => {
               const item = itemSnap.val();
               const row = document.createElement("tr");
               row.innerHTML = `
                 <td>${itemSnap.key}</td>
-                <td>${stage}</td>
+                <td>${stageSnap.key}</td>
                 <td>${item.type}</td>
                 <td>${item.title}</td>
                 <td><a href="${item.url}" target="_blank">🔗 فتح</a></td>
-                <td>
-                  <button class="action delete-btn" onclick="deleteContent('${stage}', '${typeSnap.key}', '${itemSnap.key}')">حذف</button>
-                </td>
-              `;
+                <td><button class="action delete-btn" onclick="deleteContent('${stageSnap.key}','${typeSnap.key}','${itemSnap.key}')">حذف</button></td>`;
               tbody.appendChild(row);
             });
           });
@@ -377,47 +328,28 @@
       });
     }
 
-    // حذف المحتوى
     function deleteContent(stage, type, id) {
-      db.ref(`content/${stage}/${type}s/${id}`).remove()
-        .then(() => loadContent());
+      db.ref(`content/${stage}/${type}s/${id}`).remove().then(loadContent);
     }
 
-    // إضافة إعلان جديد
     function addAnnouncement() {
-      const stage = document.getElementById("ann-stage").value;
-      const text = document.getElementById("ann-text").value.trim();
-
-      if (!stage || !text) {
-        alert("يرجى إدخال المرحلة ونص الإعلان.");
-        return;
-      }
-
-      const data = { text, updatedAt: new Date().toISOString() };
-      db.ref(`announcements/${stage}`).set(data).then(() => {
-        document.getElementById("ann-text").value = "";
-        loadAnnouncements();
-      });
+      const stage = document.getElementById("ann-stage").value,
+            text  = document.getElementById("ann-text").value.trim();
+      if (!stage || !text) return alert("يرجى إدخال المرحلة ونص الإعلان.");
+      db.ref(`announcements/${stage}`).set({ text, updatedAt: new Date().toISOString() }).then(loadAnnouncements);
     }
 
-    // تحميل الإعلانات
     function loadAnnouncements() {
       document.getElementById("loader-ann").style.display = "block";
-      const table = document.getElementById("tbl-ann");
-      const tbody = table.querySelector("tbody");
+      const table = document.getElementById("tbl-ann"), tbody = table.querySelector("tbody");
       tbody.innerHTML = "";
-
       db.ref("announcements").once("value").then(snapshot => {
-        const data = snapshot.val() || {};
-        Object.entries(data).forEach(([stage, ann]) => {
+        Object.entries(snapshot.val()||{}).forEach(([stage, ann]) => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${stage}</td>
             <td>${ann.text}</td>
-            <td>
-              <button class="action delete-btn" onclick="deleteAnnouncement('${stage}')">حذف</button>
-            </td>
-          `;
+            <td><button class="action delete-btn" onclick="deleteAnnouncement('${stage}')">حذف</button></td>`;
           tbody.appendChild(row);
         });
       }).finally(() => {
@@ -426,53 +358,38 @@
       });
     }
 
-    // حذف الإعلان
     function deleteAnnouncement(stage) {
-      db.ref(`announcements/${stage}`).remove()
-        .then(() => loadAnnouncements());
+      db.ref(`announcements/${stage}`).remove().then(loadAnnouncements);
     }
 
-    // تحميل الإحصائيات
     let chart;
     function loadStats() {
       db.ref('users/students').once('value').then(snapshot => {
-        const data = snapshot.val() || {};
-        const counts = { grade4:0, grade5:0, grade6:0, prep1:0, prep2:0, prep3:0 };
-        let total = 0, active = 0, today = 0, pending = 0;
-        const todayDate = new Date().toISOString().split('T')[0];
-
-        Object.entries(data).forEach(([userId, user]) => {
+        const data = snapshot.val()||{}, counts={grade4:0,grade5:0,grade6:0,prep1:0,prep2:0,prep3:0};
+        let total=0,active=0,today=0,pending=0;
+        const todayKey = new Date().toISOString().split('T')[0];
+        Object.values(data).forEach(u => {
           total++;
-          if (user.isActive) active++;
-          if (user.registrationDate && user.registrationDate.includes(todayDate)) today++;
-          if (!user.isActive && user.payment && user.payment.sent) pending++;
-          if (user.stage && counts[user.stage] !== undefined) counts[user.stage]++;
+          if (u.isActive) active++;
+          if (u.registrationDate && u.registrationDate.includes(todayKey)) today++;
+          if (!u.isActive && u.payment && u.payment.sent) pending++;
+          if (counts[u.stage] !== undefined) counts[u.stage]++;
         });
-
         document.getElementById("cntAll").innerText = total;
         document.getElementById("cntActive").innerText = active;
         document.getElementById("cntToday").innerText = today;
         document.getElementById("cntPending").innerText = pending;
-
         const ctx = document.getElementById("chartStages").getContext("2d");
         if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: ["رابع", "خامس", "سادس", "أولى إعدادى", "ثانية إعدادى", "ثالثة إعدادى"],
-            datasets: [{
-              label: "عدد الطلاب",
-              data: Object.values(counts),
-              backgroundColor: "#3ab54a",
-              borderRadius: 5
-            }]
-          },
-          options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        chart = new Chart(ctx,{
+          type:"bar",
+          data:{ labels:["رابع","خامس","سادس","أولى إعدادى","ثانية إعدادى","ثالثة إعدادى"],
+            datasets:[{ label:"عدد الطلاب", data:Object.values(counts), backgroundColor:"#3ab54a", borderRadius:5 }]},
+          options:{ responsive:true, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } } }
         });
       });
     }
 
-    // تهيئة الصفحة
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('dashboard').style.display = 'none';
     });
