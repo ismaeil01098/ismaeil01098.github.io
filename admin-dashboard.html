@@ -436,7 +436,9 @@
       updatedAt: new Date().toISOString()
     };
 
-    db.ref(`settings/announcements/${stage}`).set(data).then(() => {
+    // الحفظ في المسار الصحيح مع استخدام حالة أحرف صغيرة
+    const normalizedStage = stage.toLowerCase();
+    db.ref(`settings/announcements/${normalizedStage}`).set(data).then(() => {
       document.getElementById("ann-text").value = "";
       loadAnnouncements();
     });
@@ -449,9 +451,10 @@
     tbody.innerHTML = "";
 
     db.ref("settings/announcements").once("value").then(snapshot => {
-      snapshot.forEach(stageSnap => {
-        const stage = stageSnap.key;
-        const ann = stageSnap.val();
+      const data = snapshot.val() || {};
+      
+      // عرض جميع الإعلانات لكل المراحل
+      Object.entries(data).forEach(([stage, ann]) => {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${stage}</td>
@@ -561,4 +564,4 @@
   });
 </script>
 </body>
-      </html>
+  </html>
