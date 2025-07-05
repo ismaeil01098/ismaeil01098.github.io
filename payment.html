@@ -11,158 +11,67 @@
     body {
       font-family: 'Tajawal', sans-serif;
       background: linear-gradient(135deg, #2f2f2f, #3d3d3d);
-      color: #fff;
-      margin: 0;
+      color: #fff; margin: 0;
       padding: 2rem 1rem;
     }
-
     .container {
-      max-width: 650px;
-      margin: auto;
-      background: #1e1e1e;
-      padding: 2rem;
-      border-radius: 14px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      max-width: 650px; margin: auto;
+      background: #1e1e1e; padding: 2rem;
+      border-radius: 14px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
       position: relative;
     }
-
-    h2 {
-      text-align: center;
-      color: #f1c40f;
-      margin-bottom: 1.5rem;
-      font-size: 1.7rem;
-    }
-
-    label {
-      display: block;
-      margin: 1rem 0 0.3rem;
-      font-weight: bold;
-      color: #eee;
-    }
-
+    h2 { text-align: center; color: #f1c40f; margin-bottom: 1.5rem; font-size: 1.7rem; }
+    label { display: block; margin: 1rem 0 0.3rem; font-weight: bold; color: #eee; }
     select, input {
-      width: 100%;
-      padding: 0.7rem;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-      background: #333;
-      color: #fff;
-      margin-bottom: 0.5rem;
+      width: 100%; padding: 0.7rem; border-radius: 8px;
+      border: none; font-size: 1rem;
+      background: #333; color: #fff; margin-bottom: 0.5rem;
     }
-
     .highlight {
-      font-size: 1.2rem;
-      color: #2ecc71;
-      text-align: center;
-      margin: 0.7rem 0;
-      font-weight: bold;
+      font-size: 1.2rem; color: #2ecc71;
+      text-align: center; margin: 0.7rem 0; font-weight: bold;
     }
-
     .box {
-      background: #292929;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
+      background: #292929; padding: 1rem;
+      border-radius: 8px; margin-top: 1rem;
     }
-
-    .box p {
-      margin: 0.4rem 0;
-      font-size: 0.95rem;
-    }
-
+    .box p { margin: 0.4rem 0; font-size: 0.95rem; }
     button {
-      width: 100%;
-      margin-top: 1rem;
-      padding: 0.9rem;
-      font-size: 1rem;
-      font-weight: bold;
-      background-color: #f1c40f;
-      color: #333;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      width: 100%; margin-top: 1rem; padding: 0.9rem;
+      font-size: 1rem; font-weight: bold;
+      background-color: #f1c40f; color: #333;
+      border: none; border-radius: 8px; cursor: pointer;
       transition: 0.3s;
     }
-
-    button:hover {
-      background-color: #d4ac0d;
-    }
-
+    button:hover { background-color: #d4ac0d; }
     #status {
-      margin-top: 1rem;
-      font-size: 1rem;
-      text-align: center;
-      color: #00ffcc;
+      margin-top: 1rem; font-size: 1rem;
+      text-align: center; color: #00ffcc;
       min-height: 24px;
     }
-
-    /* زر الدعم */
     #support-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: #f1c40f;
-      color: #333;
-      padding: 10px 18px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      z-index: 999;
+      position: fixed; bottom: 20px; left: 20px;
+      background: #f1c40f; color: #333;
+      padding: 10px 18px; border-radius: 30px;
+      cursor: pointer; font-weight: bold;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 999;
       transition: 0.3s;
     }
-
-    #support-btn:hover {
-      background: #d4ac0d;
-    }
-
-    /* النافذة المنبثقة */
+    #support-btn:hover { background: #d4ac0d; }
     #support-popup {
-      position: fixed;
-      bottom: 75px;
-      left: 20px;
-      background: #222;
-      color: #fff;
-      padding: 1.2rem;
-      border-radius: 12px;
-      width: 300px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      display: none;
-      z-index: 999;
+      position: fixed; bottom: 75px; left: 20px;
+      background: #222; color: #fff; padding: 1.2rem;
+      border-radius: 12px; width: 300px; font-size: 0.9rem;
+      line-height: 1.6; box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      display: none; z-index: 999;
     }
-
-    #support-popup h4 {
-      margin-top: 0;
-      font-size: 1rem;
-      color: #f1c40f;
-    }
-
-    #support-popup ul {
-      padding-left: 1rem;
-      margin: 0;
-    }
-
-    #support-popup ul li {
-      margin-bottom: 0.5rem;
-      list-style: disc;
-    }
-
+    #support-popup h4 { margin-top: 0; font-size: 1rem; color: #f1c40f; }
+    #support-popup ul { padding-left: 1rem; margin: 0; }
+    #support-popup ul li { margin-bottom: 0.5rem; list-style: disc; }
     @media (max-width: 480px) {
-      .container {
-        padding: 1.2rem;
-      }
-
-      button {
-        font-size: 0.95rem;
-      }
-
-      #support-popup {
-        width: 90%;
-        left: 5%;
-      }
+      .container { padding: 1.2rem; }
+      button { font-size: 0.95rem; }
+      #support-popup { width: 90%; left: 5%; }
     }
   </style>
 </head>
@@ -200,10 +109,8 @@
     <div id="status"></div>
   </div>
 
-  <!-- زر الدعم الفني -->
   <div id="support-btn" onclick="toggleSupport()">💬 الأسئلة الشائعة</div>
 
-  <!-- نافذة الدعم الفني -->
   <div id="support-popup">
     <h4 style="margin-top:0;">لماذا يوجد رسوم اشتراك؟</h4>
     <ul>
@@ -217,7 +124,6 @@
   </div>
   
   <script>
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
       authDomain: "manssat-science.firebaseapp.com",
@@ -228,13 +134,9 @@
       appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
     };
 
-    // تهيئة التطبيق فقط إذا لم يتم تهيئته مسبقاً
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // تحديد السعر حسب المرحلة
     function setPrice() {
       const stage = document.getElementById("stage").value;
       const priceDisplay = document.getElementById("price");
@@ -247,7 +149,6 @@
       }
     }
 
-    // إرسال صورة الدفع
     function markAsSent() {
       const phone = document.getElementById("phone").value.trim();
       const stage = document.getElementById("stage").value;
@@ -262,10 +163,9 @@
         return;
       }
       
-      // حفظ المرحلة الدراسية وصورة الدفع
       const updates = {
-        "المرحلة": stage,
-        "payment": {
+        stage: stage,
+        payment: {
           sent: true,
           sentAt: new Date().toISOString()
         }
@@ -275,8 +175,6 @@
         .then(() => {
           document.getElementById("status").innerText = "✅ تم تسجيل إرسال صورة الدفع. يرجى انتظار التفعيل.";
           document.getElementById("status").style.color = "#00ffcc";
-          
-          // حفظ رقم الهاتف في localStorage للاستخدام لاحقاً
           localStorage.setItem('studentPhone', phone);
         })
         .catch((err) => {
@@ -285,7 +183,6 @@
         });
     }
 
-    // تحقق من التفعيل
     function checkActivation() {
       const phone = document.getElementById("phone").value.trim();
       if (!/^01\d{9}$/.test(phone)) {
@@ -302,16 +199,11 @@
             return;
           }
 
-          if (data["اشتراك_مفعل"] === true) {
+          if (data.isActive === true) {
             document.getElementById("status").innerText = "✅ تم التفعيل! سيتم نقلك خلال ثوانٍ...";
             document.getElementById("status").style.color = "#00ffcc";
-            
-            // حفظ رقم الهاتف في localStorage
             localStorage.setItem('studentPhone', phone);
-            
-            setTimeout(() => {
-              window.location.href = "login.html";
-            }, 2000);
+            setTimeout(() => window.location.href = "login.html", 2000);
           } else {
             document.getElementById("status").innerText = "⏳ لم يتم التفعيل بعد، يرجى الانتظار قليلاً.";
             document.getElementById("status").style.color = "#f1c40f";
@@ -323,7 +215,6 @@
         });
     }
 
-    // الانتقال إلى المنصة بعد التفعيل
     function goToPlatform() {
       const phone = document.getElementById("phone").value.trim();
       if (!/^01\d{9}$/.test(phone)) {
@@ -339,10 +230,9 @@
             return;
           }
 
-          if (data["اشتراك_مفعل"] === true) {
-            const stage = data["المرحلة"];
+          if (data.isActive === true) {
+            const stage = data.stage;
             if (stage) {
-              // حفظ رقم الهاتف في localStorage
               localStorage.setItem('studentPhone', phone);
               window.location.href = stage + ".html";
             } else {
@@ -357,18 +247,14 @@
         });
     }
 
-    // عرض أو إخفاء الدعم الفني
     function toggleSupport() {
       const popup = document.getElementById("support-popup");
       popup.style.display = popup.style.display === "none" ? "block" : "none";
     }
 
-    // جلب رقم الهاتف من localStorage إن وجد
     document.addEventListener('DOMContentLoaded', () => {
       const savedPhone = localStorage.getItem('studentPhone');
-      if (savedPhone) {
-        document.getElementById('phone').value = savedPhone;
-      }
+      if (savedPhone) document.getElementById('phone').value = savedPhone;
     });
   </script>
 </body>
