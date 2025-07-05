@@ -81,7 +81,11 @@
     appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
   
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const auth = firebase.auth();
   const db = firebase.database();
 
   function showMessage(msg, success = false) {
@@ -104,35 +108,46 @@
       return;
     }
 
-    db.ref("users/students/" + phone).once("value").then(snapshot => {
-      const user = snapshot.val();
+    const email = `${phone}@manssat.com`;
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        
+        // Get user data from database
+        return db.ref("users/students/" + user.uid).once("value");
+      })
+      .then(snapshot => {
+        const user = snapshot.val();
+        if (!user) {
+          showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
+          localStorage.setItem('studentPhone', phone);
+          setTimeout(() => window.location.href = "register.html", 2000);
+          return;
+        }
 
-      if (!user) {
-        showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
+        if (!user.isActive) {
+          showMessage("⏳ الحساب غير مفعل. سيتم توجيهك للدفع...");
+          localStorage.setItem('studentPhone', phone);
+          setTimeout(() => window.location.href = "payment.html", 2000);
+          return;
+        }
+
         localStorage.setItem('studentPhone', phone);
-        setTimeout(() => window.location.href = "register.html", 2000);
-        return;
-      }
-
-      if (user.password !== password) {
-        showMessage("❌ كلمة المرور غير صحيحة.");
-        return;
-      }
-
-      if (!user.isActive) {
-        showMessage("⏳ الحساب غير مفعل. سيتم توجيهك للدفع...");
-        localStorage.setItem('studentPhone', phone);
-        setTimeout(() => window.location.href = "payment.html", 2000);
-        return;
-      }
-
-      localStorage.setItem('studentPhone', phone);
-      showMessage("✅ تسجيل دخول ناجح. جارٍ التوجيه...", true);
-      setTimeout(() => window.location.href = user.stage + ".html", 1500);
-    }).catch(err => {
-      console.error(err);
-      showMessage("⚠️ حدث خطأ أثناء الاتصال. حاول مرة أخرى.");
-    });
+        showMessage("✅ تسجيل دخول ناجح. جارٍ التوجيه...", true);
+        setTimeout(() => window.location.href = user.stage + ".html", 1500);
+      })
+      .catch(err => {
+        console.error(err);
+        if (err.code === "auth/user-not-found") {
+          showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
+          localStorage.setItem('studentPhone', phone);
+          setTimeout(() => window.location.href = "register.html", 2000);
+        } else if (err.code === "auth/wrong-password") {
+          showMessage("❌ كلمة المرور غير صحيحة.");
+        } else {
+          showMessage("⚠️ حدث خطأ أثناء الاتصال. حاول مرة أخرى.");
+        }
+      });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
