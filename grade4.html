@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>الصف الرابع – منصة العلوم</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -27,23 +27,25 @@
       border-bottom: 2px solid #64ffda;
     }
     .announcement-bar {
-      background: linear-gradient(45deg, #b6a564, #d4b84d);
-      color: #000;
-      padding: 0.5rem 1rem;
+      background: #ffeb3b !important;
+      color: #000 !important;
+      padding: 12px !important;
       overflow: hidden;
       white-space: nowrap;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
       position: relative;
+      z-index: 100;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .announcement-text {
       display: inline-block;
-      animation: scrollText 20s linear infinite;
-      padding-right: 100%; /* لضمان التمرير المستمر */
+      padding-left: 100%;
+      white-space: nowrap;
+      animation: scrollText 15s linear infinite;
     }
     @keyframes scrollText {
-      0% { transform: translateX(0%); }
+      0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
     .student-info {
@@ -197,7 +199,7 @@
   
   <!-- شريط الإعلانات -->
   <div class="announcement-bar">
-    <div id="announcement" class="announcement-text">مرحباً بطلاب الصف الرابع! نتمنى لكم عاماً دراسياً مميزاً مع منصة العلوم 💡</div>
+    <div id="announcement" class="announcement-text">جاري تحميل الإعلانات...</div>
   </div>
   
   <!-- معلومات الطالب -->
@@ -377,23 +379,22 @@
 
     // جلب الإعلانات من قاعدة البيانات
     function loadAnnouncements() {
-      // استخدام المسار الصحيح مع حالة أحرف صغيرة
-      const ref = db.ref("settings/announcements/grade4");
+      const announcementRef = db.ref("settings/announcements/grade4");
       
-      // استخدام onValue() بدلاً من once() للتحديث التلقائي
-      ref.on("value", (snapshot) => {
-        const announcementData = snapshot.val();
+      announcementRef.on("value", (snapshot) => {
+        const announcementEl = document.getElementById("announcement");
+        const data = snapshot.val();
         
-        if (announcementData && announcementData.text) {
-          document.getElementById("announcement").innerText = announcementData.text;
+        if (data && data.text) {
+          announcementEl.innerText = data.text;
+          console.log("تم تحميل الإعلان بنجاح");
         } else {
-          document.getElementById("announcement").innerText = 
-            "مرحباً بطلاب الصف الرابع! يمكنكم الآن الوصول للمحتوى التعليمي 💡";
+          announcementEl.innerText = "مرحباً بطلاب الصف الرابع! تابعوا آخر التحديثات هنا.";
+          console.warn("لا يوجد إعلانات - تم عرض النص الافتراضي");
         }
       }, (error) => {
-        console.error("حدث خطأ في جلب الإعلانات:", error);
-        document.getElementById("announcement").innerText = 
-          "مرحباً بطلاب الصف الرابع! نتمنى لكم عاماً دراسياً مميزاً مع منصة العلوم 💡";
+        console.error("خطأ في جلب الإعلانات:", error);
+        document.getElementById("announcement").innerText = "تحديثاتنا اليومية قريباً...";
       });
     }
 
