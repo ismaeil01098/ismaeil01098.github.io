@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -69,7 +68,7 @@
   <div id="overlay" class="overlay">
     <div class="password-box">
       <h3>أدخل بيانات المدير</h3>
-      <input type="email" id="admin-email" placeholder="📧 البريد الإلكتروني" />
+      <input type="text" id="admin-phone" placeholder="📱 رقم الهاتف" maxlength="11" />
       <input type="password" id="admin-pass" placeholder="🔒 كلمة المرور" />
       <button onclick="checkPassword()">دخول</button>
       <div id="pass-error" class="error"></div>
@@ -200,6 +199,7 @@
   </div>
   
   <script>
+    // التهيئة
     const firebaseConfig = {
       apiKey: "AIzaSyDEvdGB2dHbB9k0mvAa14VFaKvjSfooB20",
       authDomain: "manssat-science.firebaseapp.com",
@@ -210,25 +210,41 @@
       appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
     };
     
+    // تهيئة Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const auth = firebase.auth();
 
+    // الدخول إلى لوحة التحكم
     function checkPassword() {
-      const email = document.getElementById('admin-email').value.trim();
+      const phone = document.getElementById('admin-phone').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
-      
-      auth.signInWithEmailAndPassword(email, pass)
-        .then(() => {
+
+      // التحقق من صحة رقم الهاتف
+      if (!/^01\d{9}$/.test(phone)) {
+        document.getElementById('pass-error').innerText = 'رقم الهاتف غير صحيح';
+        return;
+      }
+
+      // التحقق من قاعدة البيانات
+      db.ref("users/students/" + phone).once("value").then(snapshot => {
+        const userData = snapshot.val();
+        
+        // التحقق من وجود المستخدم وأنه مدير
+        if (userData && userData.isAdmin === true && userData.password === pass) {
+          // تم التحقق بنجاح
           document.getElementById('overlay').style.display = 'none';
           document.getElementById('dashboard').style.display = 'block';
           showSection('students');
-        })
-        .catch(error => {
-          document.getElementById('pass-error').innerText = 'بيانات الدخول غير صحيحة';
-        });
+        } else {
+          document.getElementById('pass-error').innerText = 
+            'بيانات الدخول غير صحيحة أو ليست صلاحيات مدير';
+        }
+      }).catch(error => {
+        document.getElementById('pass-error').innerText = 'حدث خطأ في الاتصال';
+      });
     }
 
+    // إظهار القسم المحدد
     function showSection(id) {
       const sections = ['students', 'content', 'announce', 'stats'];
       sections.forEach(sec => {
@@ -245,6 +261,7 @@
       else if (id === 'stats') loadStats();
     }
 
+    // تحميل بيانات الطلاب
     function loadStudents() {
       document.getElementById("loader-stu").style.display = "block";
       const table = document.getElementById("tbl-stu");
@@ -282,16 +299,19 @@
       });
     }
 
+    // تفعيل/إلغاء تفعيل الطالب
     function toggleActivation(phone, newState) {
       db.ref(`users/students/${phone}/isActive`).set(newState)
         .then(() => loadStudents());
     }
 
+    // حذف الطالب
     function deleteStudent(phone) {
       db.ref(`users/students/${phone}`).remove()
         .then(() => loadStudents());
     }
 
+    // إضافة محتوى جديد
     function submitContent() {
       const stage = document.getElementById("content-stage").value;
       const type = document.getElementById("content-type").value;
@@ -314,6 +334,7 @@
         });
     }
 
+    // تحميل المحتوى
     function loadContent() {
       document.getElementById("loader-con").style.display = "block";
       const table = document.getElementById("tbl-con");
@@ -347,11 +368,13 @@
       });
     }
 
+    // حذف المحتوى
     function deleteContent(stage, type, id) {
       db.ref(`content/${stage}/${type}s/${id}`).remove()
         .then(() => loadContent());
     }
 
+    // إضافة إعلان جديد
     function addAnnouncement() {
       const stage = document.getElementById("ann-stage").value;
       const text = document.getElementById("ann-text").value.trim();
@@ -368,6 +391,7 @@
       });
     }
 
+    // تحميل الإعلانات
     function loadAnnouncements() {
       document.getElementById("loader-ann").style.display = "block";
       const table = document.getElementById("tbl-ann");
@@ -393,11 +417,13 @@
       });
     }
 
+    // حذف الإعلان
     function deleteAnnouncement(stage) {
       db.ref(`announcements/${stage}`).remove()
         .then(() => loadAnnouncements());
     }
 
+    // تحميل الإحصائيات
     let chart;
     function loadStats() {
       db.ref('users/students').once('value').then(snapshot => {
@@ -437,6 +463,7 @@
       });
     }
 
+    // تهيئة الصفحة
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('dashboard').style.display = 'none';
     });
