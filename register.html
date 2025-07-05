@@ -7,69 +7,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
       background: linear-gradient(135deg, #252525, #3b3b3b);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      color: #fff; display: flex;
+      justify-content: center; align-items: center;
+      height: 100vh; margin: 0;
     }
     .register-container {
-      background: #1e1e1e;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      background: #1e1e1e; padding: 2rem;
+      border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
       width: 90%; max-width: 450px;
     }
-    h2 {
-      text-align: center;
-      color: #f1c40f;
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-top: 1rem;
-      margin-bottom: 0.3rem;
-    }
+    h2 { text-align: center; color: #f1c40f; margin-bottom: 1.5rem; }
+    label { display: block; margin-top: 1rem; margin-bottom: 0.3rem; }
     input, select {
-      width: 100%;
-      padding: 0.7rem;
-      border-radius: 8px;
-      border: none;
-      background: #333;
-      color: #fff;
-      font-size: 1rem;
+      width: 100%; padding: 0.7rem; border-radius: 8px;
+      border: none; background: #333; color: #fff; font-size: 1rem;
     }
     button {
-      width: 100%;
-      margin-top: 1.5rem;
-      padding: 0.9rem;
-      font-size: 1rem;
-      font-weight: bold;
-      background-color: #f1c40f;
-      color: #333;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      width: 100%; margin-top: 1.5rem; padding: 0.9rem;
+      font-size: 1rem; font-weight: bold;
+      background-color: #f1c40f; color: #333;
+      border: none; border-radius: 8px; cursor: pointer;
     }
     .message {
-      margin-top: 1rem;
-      text-align: center;
-      min-height: 1.2rem;
-      font-size: 0.95rem;
+      margin-top: 1rem; text-align: center;
+      min-height: 1.2rem; font-size: 0.95rem;
       color: #ff8080;
     }
     footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #aaa;
+      position: fixed; bottom: 10px; width: 100%;
+      text-align: center; font-size: 0.8rem; color: #aaa;
     }
   </style>
 </head>
@@ -121,11 +92,9 @@
     appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
   
-  // تهيئة التطبيق فقط إذا لم يتم تهيئته مسبقاً
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  const auth = firebase.auth();
 
   function showMessage(msg, success = false) {
     const msgEl = document.getElementById("register-msg");
@@ -181,12 +150,13 @@
       
       // إنشاء الحساب
       const userData = {
-        الاسم: name,
-        المرحلة: stage,
-        المحافظة: governorate,
-        كلمة_السر: password,
-        مسجل_في: new Date().toISOString(),
-        اشتراك_مفعل: false
+        name: name,
+        stage: stage,
+        governorate: governorate,
+        password: password,
+        registrationDate: new Date().toISOString(),
+        isActive: false,
+        isAdmin: false
       };
       
       db.ref("users/students/" + phone).set(userData)
@@ -201,12 +171,9 @@
     });
   }
 
-  // تعبئة رقم الهاتف من الصفحة السابقة
   document.addEventListener('DOMContentLoaded', () => {
     const tempPhone = localStorage.getItem('studentPhone');
-    if (tempPhone) {
-      document.getElementById('phone').value = tempPhone;
-    }
+    if (tempPhone) document.getElementById('phone').value = tempPhone;
   });
 </script>
 </body>
