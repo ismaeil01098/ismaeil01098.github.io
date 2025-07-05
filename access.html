@@ -7,261 +7,105 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Tajawal', sans-serif;
       background: linear-gradient(135deg, #1a2a6c, #2c3e50);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      color: #fff; min-height: 100vh;
+      display: flex; flex-direction: column;
       overflow-x: hidden;
     }
-
-    /* شريط الرأس */
     .header {
-      padding: 1rem;
-      text-align: center;
+      padding: 1rem; text-align: center;
       background: rgba(0, 0, 0, 0.4);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
     }
-
     .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.8rem;
+      display: flex; align-items: center;
+      justify-content: center; gap: 0.8rem;
       margin-bottom: 0.3rem;
     }
-
-    .logo-icon {
-      font-size: 2rem;
-      color: #ffdd57;
-    }
-
-    .logo-text {
-      font-size: 1.6rem;
-      font-weight: 800;
-    }
-
-    .tagline {
-      font-size: 0.95rem;
-      color: #f1c40f;
-      margin-top: 0.3rem;
-    }
-
-    /* القسم الرئيسي */
+    .logo-icon { font-size: 2rem; color: #ffdd57; }
+    .logo-text { font-size: 1.6rem; font-weight: 800; }
+    .tagline { font-size: 0.95rem; color: #f1c40f; margin-top: 0.3rem; }
     .access-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      position: relative;
-      z-index: 1;
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; padding: 1.5rem;
+      position: relative; z-index: 1;
       overflow-y: auto;
     }
-
     .access-container::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      content: ""; position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
       background: url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3') no-repeat center center;
-      background-size: cover;
-      opacity: 0.15;
-      z-index: -1;
+      background-size: cover; opacity: 0.15; z-index: -1;
     }
-
     .access-box {
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 25px;
-      padding: 2rem;
-      text-align: center;
-      max-width: 600px;
-      width: 100%;
+      backdrop-filter: blur(10px); border-radius: 25px;
+      padding: 2rem; text-align: center;
+      max-width: 600px; width: 100%;
       border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
       margin: 1rem 0;
     }
-
-    .access-title {
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      color: #ffdd57;
-    }
-
-    .access-description {
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
+    .access-title { font-size: 1.8rem; margin-bottom: 1.5rem; color: #ffdd57; }
+    .access-description { font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6; }
     .buttons-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-      margin-top: 1.5rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.2rem; margin-top: 1.5rem;
     }
-
     .access-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem 1.2rem;
-      background: rgba(255, 221, 87, 0.2);
-      border-radius: 20px;
-      text-decoration: none;
-      color: white;
-      transition: all 0.4s ease;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 1.5rem 1.2rem; background: rgba(255, 221, 87, 0.2);
+      border-radius: 20px; text-decoration: none;
+      color: white; transition: all 0.4s ease;
       border: 1px solid rgba(255, 255, 255, 0.1);
       min-height: 180px;
     }
-
     .access-btn:hover {
       background: rgba(255, 221, 87, 0.3);
       transform: translateY(-8px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
-
-    .btn-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: #ffdd57;
-    }
-
-    .btn-text {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .btn-desc {
-      font-size: 0.95rem;
-      opacity: 0.9;
-    }
-
-    /* الشريط السفلي */
+    .btn-icon { font-size: 2.5rem; margin-bottom: 1rem; color: #ffdd57; }
+    .btn-text { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .btn-desc { font-size: 0.95rem; opacity: 0.9; }
     .footer {
-      padding: 1rem;
-      text-align: center;
+      padding: 1rem; text-align: center;
       background: rgba(0, 0, 0, 0.6);
-      font-size: 0.95rem;
-      position: sticky;
-      bottom: 0;
+      font-size: 0.95rem; position: sticky; bottom: 0;
     }
-
-    /* تأثيرات متحركة */
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-
-    .floating {
-      animation: float 5s ease-in-out infinite;
-    }
-
-    /* تصميم متجاوب */
     @media (max-width: 768px) {
-      .buttons-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .access-title {
-        font-size: 1.6rem;
-      }
-      
-      .access-description {
-        font-size: 1rem;
-      }
-      
-      .access-box {
-        padding: 1.5rem;
-      }
-      
-      .btn-text {
-        font-size: 1.2rem;
-      }
+      .buttons-grid { grid-template-columns: 1fr; }
+      .access-title { font-size: 1.6rem; }
+      .access-description { font-size: 1rem; }
+      .access-box { padding: 1.5rem; }
+      .btn-text { font-size: 1.2rem; }
     }
-    
     @media (max-width: 480px) {
-      .logo-text {
-        font-size: 1.4rem;
-      }
-      
-      .tagline {
-        font-size: 0.85rem;
-      }
-      
-      .access-title {
-        font-size: 1.4rem;
-      }
-      
-      .access-description {
-        font-size: 0.95rem;
-      }
-      
-      .access-btn {
-        padding: 1.2rem;
-        min-height: 160px;
-      }
-      
-      .btn-icon {
-        font-size: 2rem;
-      }
-      
-      .footer {
-        font-size: 0.85rem;
-        padding: 0.8rem;
-      }
-    }
-    
-    /* شريط التمرير */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 221, 87, 0.5);
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 221, 87, 0.7);
+      .logo-text { font-size: 1.4rem; }
+      .tagline { font-size: 0.85rem; }
+      .access-title { font-size: 1.4rem; }
+      .access-description { font-size: 0.95rem; }
+      .access-btn { padding: 1.2rem; min-height: 160px; }
+      .btn-icon { font-size: 2rem; }
+      .footer { font-size: 0.85rem; padding: 0.8rem; }
     }
   </style>
 </head>
 <body>
-  <!-- شريط الرأس -->
   <div class="header">
     <div class="logo">
-      <div class="logo-icon">
-        <i class="fas fa-atom"></i>
-      </div>
+      <div class="logo-icon"><i class="fas fa-atom"></i></div>
       <div class="logo-text">منصة العلوم التعليمية</div>
     </div>
     <div class="tagline">بوابة الدخول إلى عالم العلوم الممتع</div>
   </div>
 
-  <!-- القسم الرئيسي -->
   <div class="access-container">
-    <div class="access-box floating">
+    <div class="access-box">
       <h1 class="access-title">مرحباً بعودة طلابنا الأعزاء!</h1>
       <p class="access-description">
         سجل دخولك الآن للوصول إلى محتوى العلوم المميز لمرحلتك الدراسية،
@@ -270,17 +114,13 @@
       
       <div class="buttons-grid">
         <a href="login.html" class="access-btn">
-          <div class="btn-icon">
-            <i class="fas fa-sign-in-alt"></i>
-          </div>
+          <div class="btn-icon"><i class="fas fa-sign-in-alt"></i></div>
           <div class="btn-text">تسجيل الدخول</div>
           <div class="btn-desc">لديك حساب بالفعل</div>
         </a>
         
         <a href="register.html" class="access-btn">
-          <div class="btn-icon">
-            <i class="fas fa-user-plus"></i>
-          </div>
+          <div class="btn-icon"><i class="fas fa-user-plus"></i></div>
           <div class="btn-text">إنشاء حساب</div>
           <div class="btn-desc">مستخدم جديد</div>
         </a>
@@ -288,25 +128,8 @@
     </div>
   </div>
 
-  <!-- الشريط السفلي -->
   <div class="footer">
     برمجة وتصميم: أ. إسماعيل عماد – 01122104596
   </div>
-
-  <script>
-    // تأثيرات عند التحميل
-    document.addEventListener('DOMContentLoaded', () => {
-      const buttons = document.querySelectorAll('.access-btn');
-      
-      setTimeout(() => {
-        buttons.forEach((btn, index) => {
-          setTimeout(() => {
-            btn.style.opacity = '1';
-            btn.style.transform = 'translateY(0)';
-          }, 300 * index);
-        });
-      }, 500);
-    });
-  </script>
 </body>
 </html>
