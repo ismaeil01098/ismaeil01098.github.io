@@ -7,69 +7,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <style>
     body {
       font-family: 'Tajawal', sans-serif;
       background: linear-gradient(135deg, #252525, #3b3b3b);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      color: #fff; display: flex;
+      justify-content: center; align-items: center;
+      height: 100vh; margin: 0;
     }
     .login-container {
-      background: #1e1e1e;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      background: #1e1e1e; padding: 2rem;
+      border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
       width: 90%; max-width: 400px;
     }
-    h2 {
-      text-align: center;
-      color: #f1c40f;
-      margin-bottom: 1.5rem;
-    }
-    label {
-      display: block;
-      margin-top: 1rem;
-      margin-bottom: 0.3rem;
-    }
+    h2 { text-align: center; color: #f1c40f; margin-bottom: 1.5rem; }
+    label { display: block; margin-top: 1rem; margin-bottom: 0.3rem; }
     input {
-      width: 100%;
-      padding: 0.7rem;
-      border-radius: 8px;
-      border: none;
-      background: #333;
-      color: #fff;
-      font-size: 1rem;
+      width: 100%; padding: 0.7rem; border-radius: 8px;
+      border: none; background: #333; color: #fff; font-size: 1rem;
     }
     button {
-      width: 100%;
-      margin-top: 1.2rem;
-      padding: 0.9rem;
-      font-size: 1rem;
-      font-weight: bold;
-      background-color: #f1c40f;
-      color: #333;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      width: 100%; margin-top: 1.2rem; padding: 0.9rem;
+      font-size: 1rem; font-weight: bold;
+      background-color: #f1c40f; color: #333;
+      border: none; border-radius: 8px; cursor: pointer;
     }
     .message {
-      margin-top: 1rem;
-      text-align: center;
-      min-height: 1.2rem;
-      font-size: 0.95rem;
+      margin-top: 1rem; text-align: center;
+      min-height: 1.2rem; font-size: 0.95rem;
       color: #ff8080;
     }
+    .reset-link {
+      margin-top: 15px; text-align: center;
+    }
+    .reset-link a {
+      color: #f1c40f; text-decoration: none;
+    }
     footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #aaa;
+      position: fixed; bottom: 10px; width: 100%;
+      text-align: center; font-size: 0.8rem; color: #aaa;
     }
   </style>
 </head>
@@ -86,11 +63,8 @@
   <button onclick="login()">دخول</button>
   <div class="message" id="login-msg"></div>
   
-  <!-- رابط استعادة كلمة المرور -->
-  <div style="margin-top: 15px; text-align: center;">
-    <a href="reset-password.html" style="color: #f1c40f; text-decoration: none;">
-      نسيت كلمة المرور؟
-    </a>
+  <div class="reset-link">
+    <a href="reset-password.html">نسيت كلمة المرور؟</a>
   </div>
 </div>
 
@@ -107,10 +81,7 @@
     appId: "1:22539678455:web:bd8cdc9ecd950a2b53d9f2"
   };
   
-  // تهيئة التطبيق فقط إذا لم يتم تهيئته مسبقاً
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
   function showMessage(msg, success = false) {
@@ -137,52 +108,37 @@
       const user = snapshot.val();
 
       if (!user) {
-        // الحساب غير موجود
         showMessage("🚫 لا يوجد حساب بهذا الرقم. سيتم تحويلك لإنشاء حساب...");
-        // حفظ رقم الهاتف في localStorage للاستخدام في صفحة التسجيل
         localStorage.setItem('studentPhone', phone);
         setTimeout(() => window.location.href = "register.html", 2000);
         return;
       }
 
-      if (user["كلمة_السر"] !== password) {
+      if (user.password !== password) {
         showMessage("❌ كلمة المرور غير صحيحة.");
         return;
       }
 
-      if (!user["اشتراك_مفعل"]) {
+      if (!user.isActive) {
         showMessage("⏳ الحساب غير مفعل. سيتم توجيهك للدفع...");
-        // حفظ رقم الهاتف في localStorage للاستخدام في صفحة الدفع
         localStorage.setItem('studentPhone', phone);
         setTimeout(() => window.location.href = "payment.html", 2000);
         return;
       }
 
-      const stage = user["المرحلة"];
-      if (!stage) {
-        showMessage("⚠️ لم يتم تحديد المرحلة الدراسية.");
-        return;
-      }
-
-      // حفظ رقم الهاتف في localStorage للاستخدام في الصفحات الأخرى
       localStorage.setItem('studentPhone', phone);
-
       showMessage("✅ تسجيل دخول ناجح. جارٍ التوجيه...", true);
-      setTimeout(() => window.location.href = stage + ".html", 1500);
+      setTimeout(() => window.location.href = user.stage + ".html", 1500);
     }).catch(err => {
       console.error(err);
       showMessage("⚠️ حدث خطأ أثناء الاتصال. حاول مرة أخرى.");
     });
   }
 
-  // تعبئة رقم الهاتف من localStorage إن وجد
   document.addEventListener('DOMContentLoaded', () => {
     const savedPhone = localStorage.getItem('studentPhone');
-    if (savedPhone) {
-      document.getElementById('phone').value = savedPhone;
-    }
+    if (savedPhone) document.getElementById('phone').value = savedPhone;
   });
 </script>
-
 </body>
 </html>
