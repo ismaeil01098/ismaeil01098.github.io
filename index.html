@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام المتابعة الطلابية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: containerAppear 0.8s ease-out;
+        }
+        
+        @keyframes containerAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #5c6bc0, transparent);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: 700;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .teacher-name {
+            font-size: 20px;
+            color: #bbdefb;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            color: #e0e0e0;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+        
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            padding-right: 45px;
+        }
+        
+        .input-wrapper::before {
+            content: '';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 1;
+        }
+        
+        #studentName + .input-wrapper::before { content: '👤'; }
+        #phoneNumber + .input-wrapper::before { content: '📱'; }
+        #accessCode + .input-wrapper::before { content: '🔢'; }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #5c6bc0;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
+        }
+        
+        input::placeholder {
+            color: #b0b0b0;
+        }
+        
+        .class-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .class-btn {
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .class-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .class-btn.selected {
+            background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+            border-color: #5c6bc0;
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(92, 107, 192, 0.4);
+        }
+        
+        .subscription-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .subscription-btn {
+            padding: 18px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .subscription-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .subscription-btn.selected {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            border-color: #43a047;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(67, 160, 71, 0.4);
+        }
+        
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #c8e6c9;
+        }
+        
+        .months {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .payment-info {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .payment-info h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #bbdefb;
+        }
+        
+        .payment-steps {
+            text-align: right;
+            margin: 20px 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-right: 4px solid #5c6bc0;
+        }
+        
+        .step-number {
+            background: #5c6bc0;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .phone-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4caf50;
+            margin: 15px 0;
+            direction: ltr;
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px dashed #4caf50;
+        }
+        
+        .code-input {
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .message {
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border: 1px solid;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .error {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(211, 47, 47, 0.2));
+            border-color: #f44336;
+            color: #ffcdd2;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.2));
+            border-color: #4caf50;
+            color: #c8e6c9;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .loading span {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            margin: 0 8px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            animation: loading 1.4s infinite ease-in-out both;
+            box-shadow: 0 0 10px rgba(92, 107, 192, 0.5);
+        }
+        
+        .loading span:nth-child(1) { animation-delay: -0.32s; }
+        .loading span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes loading {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 14px;
+            color: #b0b0b0;
+            line-height: 1.8;
+        }
+        
+        .logo {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .teacher-name {
+                font-size: 18px;
+            }
+            
+            .class-options, .subscription-options {
+                grid-template-columns: 1fr;
+            }
+            
+            input, select {
+                padding: 14px;
+            }
+            
+            .phone-number {
+                font-size: 22px;
+                padding: 10px 15px;
+            }
+            
+            .code-input {
+                font-size: 20px;
+                letter-spacing: 6px;
+            }
+        }
+        
+        /* تحسينات للروح الحديثة */
+        .glow-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(92, 107, 192, 0.2), transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .hint {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-top: 8px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-effect"></div>
+    <div class="container">
+        <div class="header">
+            <h1>نظام المتابعة الطلابية</h1>
+            <div class="teacher-name">أ/ اسماعيل عماد</div>
+            <div class="subtitle">تم إنشاء النظام بالتعاون مع أربع شركات</div>
+            <div class="subtitle">بتكلفة تخطت <span class="highlight">الـ 7 آلاف جنيه شهرياً</span></div>
+            <div class="subtitle">محاولة مني لتحسين خدمة التعليم وتطوير العملية التعليمية</div>
+        </div>
+        
+        <div class="message" id="message"></div>
+        <div class="loading" id="loading">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <!-- قسم التسجيل -->
+        <div class="form-section active" id="registrationSection">
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="studentName">اسم الطالب</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="studentName" placeholder="أدخل اسمك الكامل" required>
+                    </div>
+                    <span class="hint">يرجى كتابة الاسم ثلاثي</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber">رقم الهاتف</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="phoneNumber" placeholder="01xxxxxxxxx" required pattern="01[0-9]{9}">
+                    </div>
+                    <span class="hint">رقم الواتساب الخاص بالطالب أو ولي الأمر</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>المرحلة الدراسية</label>
+                    <select id="gradeLevel" required>
+                        <option value="">اختر المرحلة الدراسية</option>
+                        <option value="fourth">الصف الرابع الابتدائي</option>
+                        <option value="first_prep">الصف الأول الإعدادي</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="classSelection" style="display: none;">
+                    <label>الفصل الدراسي</label>
+                    <div class="class-options" id="classOptions"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>مدة الاشتراك</label>
+                    <div class="subscription-options">
+                        <div class="subscription-btn" data-months="1" data-price="60">
+                            <div class="months">شهر واحد</div>
+                            <div class="price">60 ج</div>
+                        </div>
+                        <div class="subscription-btn" data-months="2" data-price="100">
+                            <div class="months">شهرين</div>
+                            <div class="price">100 ج</div>
+                        </div>
+                        <div class="subscription-btn" data-months="3" data-price="140">
+                            <div class="months">3 شهور</div>
+                            <div class="price">140 ج</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedMonths" required>
+                    <input type="hidden" id="selectedPrice" required>
+                </div>
+                
+                <button type="submit" class="btn" id="subscribeBtn">
+                    <span>إشتراك الآن</span>
+                </button>
+            </form>
+        </div>
+        
+        <!-- قسم الدفع وإدخال الكود -->
+        <div class="form-section" id="paymentSection">
+            <div class="payment-info">
+                <h3>خطوات الإشتراك</h3>
+                
+                <div class="payment-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <strong>المبلغ المطلوب:</strong>
+                            <div id="paymentAmount" style="font-size: 24px; color: #4caf50; margin: 5px 0;">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <strong>قم بإرسال المبلغ عبر:</strong>
+                            <div class="phone-number">01122104596</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <strong>خلال 10 دقائق سيصلك كود الدخول على الواتساب</strong>
+                            <div style="margin-top: 10px; font-size: 14px; color: #e0e0e0;">
+                                كود الدخول مكون من 8 أرقام
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">
+                            <strong>أدخل الكود الذي استلمته:</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="accessCode">كود الدخول (8 أرقام)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="accessCode" class="code-input" placeholder="أدخل الكود المكون من 8 أرقام" maxlength="8" required>
+                </div>
+                <span class="hint">أدخل الكود المكون من 8 أرقام الذي استلمته على الواتساب</span>
+            </div>
+            
+            <div class="form-group">
+                <button class="btn" id="verifyCodeBtn">تفعيل الاشتراك</button>
+                <button class="btn" id="backToRegistration" style="background: rgba(255,255,255,0.1); margin-top: 10px;">
+                    العودة للتسجيل
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="logo">📚</div>
+            <div>© 2026 نظام المتابعة الطلابية</div>
+            <div>جميع الحقوق محفوظة - نسخة احترافية</div>
+            <div style="margin-top: 10px; font-size: 12px; opacity: 0.8;">
+                تم التطوير بأحدث التقنيات لتقديم أفضل تجربة تعليمية
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFO3F3E4vie6WA8fCA00rmRp_0_2CPq5I",
+            authDomain: "exam-1fd4a.firebaseapp.com",
+            projectId: "exam-1fd4a",
+            storageBucket: "exam-1fd4a.firebasestorage.app",
+            messagingSenderId: "861838351458",
+            appId: "1:861838351458:web:58087fe82ad951b9bac53b",
+            measurementId: "G-Q05JBNZJ3V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // إدارة حالة التطبيق
+        const state = {
+            currentStudent: null,
+            subscriptionData: null,
+            requestId: null
+        };
+
+        // الكوليكشنات المطلوبة
+        const COLLECTIONS = {
+            REGISTRATION_REQUESTS: 'registration_requests',
+            ACTIVE_SUBSCRIPTIONS: 'active_subscriptions',
+            STUDENTS: 'students'
+        };
+
+        // DOM Elements
+        const registrationSection = document.getElementById('registrationSection');
+        const paymentSection = document.getElementById('paymentSection');
+        const gradeLevel = document.getElementById('gradeLevel');
+        const classSelection = document.getElementById('classSelection');
+        const classOptions = document.getElementById('classOptions');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const backToRegistration = document.getElementById('backToRegistration');
+        const accessCode = document.getElementById('accessCode');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const paymentAmount = document.getElementById('paymentAmount');
+
+        // فصول الصف الرابع
+        const fourthGradeClasses = ['1/4', '2/4', '3/4', '4/4'];
+        const firstPrepClass = '3/1';
+
+        // اختيار الفصل
+        gradeLevel.addEventListener('change', function() {
+            if (this.value === 'fourth') {
+                classSelection.style.display = 'block';
+                classOptions.innerHTML = '';
+                fourthGradeClasses.forEach(className => {
+                    const btn = document.createElement('div');
+                    btn.className = 'class-btn';
+                    btn.textContent = `الفصل ${className}`;
+                    btn.dataset.class = className;
+                    btn.onclick = () => selectClass(btn);
+                    classOptions.appendChild(btn);
+                });
+            } else if (this.value === 'first_prep') {
+                classSelection.style.display = 'block';
+                classOptions.innerHTML = '';
+                const btn = document.createElement('div');
+                btn.className = 'class-btn selected';
+                btn.textContent = `الفصل ${firstPrepClass}`;
+                btn.dataset.class = firstPrepClass;
+                classOptions.appendChild(btn);
+                document.getElementById('selectedMonths').value = '';
+            } else {
+                classSelection.style.display = 'none';
+            }
+        });
+
+        function selectClass(button) {
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        // اختيار مدة الاشتراك
+        document.querySelectorAll('.subscription-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.subscription-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('selectedMonths').value = this.dataset.months;
+                document.getElementById('selectedPrice').value = this.dataset.price;
+            });
+        });
+
+        // التحقق من بيانات الجلسة عند التحميل
+        window.addEventListener('load', async () => {
+            const savedState = localStorage.getItem('studentRegistrationState');
+            
+            if (savedState) {
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    
+                    // التحقق من انتهاء المدة
+                    if (parsedState.subscriptionEndDate) {
+                        const endDate = new Date(parsedState.subscriptionEndDate);
+                        if (endDate > new Date()) {
+                            // الاشتراك لا يزال فعالاً، التحقق من وجود الطالب في قاعدة البيانات
+                            let studentQuery = null;
+                            
+                            if (parsedState.subscriptionCode) {
+                                // البحث باستخدام الكود
+                                studentQuery = query(
+                                    collection(db, COLLECTIONS.STUDENTS),
+                                    where("code", "==", parsedState.subscriptionCode)
+                                );
+                            } else if (parsedState.currentStudent?.phone) {
+                                // البحث باستخدام رقم الهاتف
+                                studentQuery = query(
+                                    collection(db, COLLECTIONS.STUDENTS),
+                                    where("phone", "==", parsedState.currentStudent.phone)
+                                );
+                            }
+                            
+                            if (studentQuery) {
+                                const studentSnapshot = await getDocs(studentQuery);
+                                
+                                if (!studentSnapshot.empty) {
+                                    const studentDoc = studentSnapshot.docs[0];
+                                    const studentData = studentDoc.data();
+                                    
+                                    // التحقق من أن الطالب نشط
+                                    if (studentData.active) {
+                                        // الطالب موجود ونشط، الانتقال إلى home.html
+                                        window.location.href = 'home.html';
+                                        return;
+                                    } else {
+                                        // الطالب غير نشط، مسح الحالة
+                                        localStorage.removeItem('studentRegistrationState');
+                                        showMessage('حسابك غير نشط، يرجى التواصل مع الإدارة', 'error');
+                                        return;
+                                    }
+                                } else {
+                                    // الطالب غير موجود في قاعدة البيانات
+                                    // الحالة: تم حذف الطالب من قاعدة البيانات
+                                    // نعود إلى حالة انتظار الدفع إذا كان هناك requestId
+                                    if (parsedState.requestId) {
+                                        // استعادة الحالة للعودة لقسم الدفع
+                                        state.currentStudent = parsedState.currentStudent;
+                                        state.subscriptionData = parsedState.subscriptionData;
+                                        state.requestId = parsedState.requestId;
+                                        showPaymentSection();
+                                        updatePaymentAmount();
+                                        showMessage('يبدو أن بياناتك تحتاج للتحديث، يرجى إدخال الكود مرة أخرى', 'error');
+                                        return;
+                                    } else {
+                                        // لا توجد بيانات كافية، مسح الحالة
+                                        localStorage.removeItem('studentRegistrationState');
+                                        showMessage('لم يتم العثور على حسابك، يرجى التسجيل مرة أخرى', 'error');
+                                        return;
+                                    }
+                                }
+                            }
+                        } else {
+                            // انتهت المدة، مسح الحالة
+                            localStorage.removeItem('studentRegistrationState');
+                            showMessage('انتهت مدة اشتراكك، يرجى التجديد', 'error');
+                            return;
+                        }
+                    }
+                    
+                    // إذا كان في مرحلة انتظار الدفع
+                    if (parsedState.subscriptionData && parsedState.requestId) {
+                        state.currentStudent = parsedState.currentStudent;
+                        state.subscriptionData = parsedState.subscriptionData;
+                        state.requestId = parsedState.requestId;
+                        showPaymentSection();
+                        updatePaymentAmount();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('خطأ في التحقق من الجلسة:', error);
+                    // في حالة أي خطأ، نمسح الحالة ونبدأ من جديد
+                    localStorage.removeItem('studentRegistrationState');
+                }
+            }
+        });
+
+        // تحديث عرض المبلغ المطلوب
+        function updatePaymentAmount() {
+            if (state.subscriptionData) {
+                paymentAmount.textContent = `${state.subscriptionData.price} جنيهاً`;
+            }
+        }
+
+        // تقديم طلب الاشتراك
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const selectedGrade = gradeLevel.value;
+            const selectedClassBtn = document.querySelector('.class-btn.selected');
+            const selectedMonths = document.getElementById('selectedMonths').value;
+            const selectedPrice = document.getElementById('selectedPrice').value;
+            
+            if (!selectedClassBtn || !selectedMonths) {
+                showMessage('يرجى اختيار الفصل ومدة الاشتراك', 'error');
+                return;
+            }
+            
+            const selectedClass = selectedClassBtn.dataset.class;
+            
+            // حفظ بيانات الطالب في الحالة المحلية
+            state.currentStudent = {
+                name: studentName,
+                phone: phoneNumber,
+                grade: selectedGrade,
+                class: selectedClass,
+                registrationDate: new Date().toISOString()
+            };
+            
+            state.subscriptionData = {
+                months: parseInt(selectedMonths),
+                price: parseInt(selectedPrice),
+                status: 'pending_payment',
+                paymentDate: null,
+                startDate: null,
+                endDate: null
+            };
+            
+            showLoading(true);
+            
+            try {
+                // حفظ طلب التسجيل في قاعدة البيانات أولاً
+                const requestData = {
+                    studentName: studentName,
+                    phone: phoneNumber,
+                    grade: selectedGrade,
+                    class: selectedClass,
+                    months: parseInt(selectedMonths),
+                    price: parseInt(selectedPrice),
+                    status: 'pending_payment',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // إضافة الطلب إلى قاعدة البيانات
+                const docRef = await addDoc(collection(db, COLLECTIONS.REGISTRATION_REQUESTS), requestData);
+                state.requestId = docRef.id;
+                
+                // حفظ في localStorage
+                localStorage.setItem('studentRegistrationState', JSON.stringify(state));
+                
+                showMessage('تم حفظ طلبك بنجاح! قم بإكمال خطوات الدفع', 'success');
+                showLoading(false);
+                
+                // الانتقال إلى قسم الدفع
+                setTimeout(() => {
+                    showPaymentSection();
+                    updatePaymentAmount();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('خطأ في حفظ الطلب:', error);
+                showMessage('حدث خطأ في حفظ طلبك، يرجى المحاولة مرة أخرى', 'error');
+                showLoading(false);
+            }
+        });
+
+        // عرض قسم الدفع
+        function showPaymentSection() {
+            registrationSection.classList.remove('active');
+            paymentSection.classList.add('active');
+            accessCode.focus();
+        }
+
+        // العودة إلى التسجيل
+        backToRegistration.addEventListener('click', () => {
+            paymentSection.classList.remove('active');
+            registrationSection.classList.add('active');
+        });
+
+        // التحقق من الكود
+        verifyCodeBtn.addEventListener('click', async () => {
+            const code = accessCode.value.trim();
+            
+            if (!code || code.length !== 8) {
+                showMessage('يرجى إدخال كود صحيح مكون من 8 أرقام', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // البحث في الكود في قاعدة البيانات
+                const subscriptionsRef = collection(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS);
+                const q = query(subscriptionsRef, where("code", "==", code));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    // الكود موجود، التحقق من عدم استخدامه من قبل
+                    const subscriptionDoc = querySnapshot.docs[0];
+                    const subscriptionData = subscriptionDoc.data();
+                    
+                    if (subscriptionData.used) {
+                        // الكود تم استخدامه مسبقاً
+                        // نتحقق هل تم استخدامه لنفس الطالب؟
+                        if (subscriptionData.studentPhone === state.currentStudent?.phone) {
+                            // نفس الطالب يحاول إعادة استخدام الكود
+                            showMessage('لقد استخدمت هذا الكود مسبقاً، يرجى الانتظار قليلاً...', 'warning');
+                            
+                            // التحقق من وجود الطالب في قاعدة البيانات
+                            const studentCheckQuery = query(
+                                collection(db, COLLECTIONS.STUDENTS),
+                                where("phone", "==", state.currentStudent.phone)
+                            );
+                            const studentCheckSnapshot = await getDocs(studentCheckQuery);
+                            
+                            if (!studentCheckSnapshot.empty) {
+                                // الطالب موجود، ننتقل مباشرة إلى home.html
+                                const studentDoc = studentCheckSnapshot.docs[0];
+                                const studentData = studentDoc.data();
+                                
+                                // حساب تاريخ الانتهاء
+                                const endDate = new Date();
+                                endDate.setMonth(endDate.getMonth() + state.subscriptionData.months);
+                                
+                                // تحديث حالة الطالب في localStorage
+                                const updatedState = {
+                                    currentStudent: state.currentStudent,
+                                    subscriptionData: state.subscriptionData,
+                                    requestId: state.requestId,
+                                    subscriptionCode: code,
+                                    subscriptionEndDate: endDate.toISOString()
+                                };
+                                localStorage.setItem('studentRegistrationState', JSON.stringify(updatedState));
+                                
+                                showMessage('تم التعرف عليك، يتم تحويلك الآن...', 'success');
+                                
+                                setTimeout(() => {
+                                    window.location.href = 'home.html';
+                                }, 2000);
+                            } else {
+                                showMessage('هذا الكود تم استخدامه مسبقاً لنفس الطالب', 'error');
+                                showLoading(false);
+                            }
+                        } else {
+                            showMessage('هذا الكود تم استخدامه مسبقاً', 'error');
+                            showLoading(false);
+                        }
+                        return;
+                    }
+                    
+                    // تحديث الكود كمستخدم وحفظ بيانات الطالب
+                    await updateDoc(doc(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS, subscriptionDoc.id), {
+                        used: true,
+                        studentName: state.currentStudent.name,
+                        studentPhone: state.currentStudent.phone,
+                        studentClass: state.currentStudent.class,
+                        activationDate: new Date().toISOString(),
+                        requestId: state.requestId
+                    });
+                    
+                    // تحديث طلب التسجيل في قاعدة البيانات
+                    if (state.requestId) {
+                        await updateDoc(doc(db, COLLECTIONS.REGISTRATION_REQUESTS, state.requestId), {
+                            status: 'active',
+                            code: code,
+                            paymentDate: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+                    
+                    // حساب تاريخ الانتهاء
+                    const endDate = new Date();
+                    endDate.setMonth(endDate.getMonth() + state.subscriptionData.months);
+                    
+                    // تحديث حالة الطالب
+                    const subscriptionEndDate = endDate.toISOString();
+                    state.subscriptionData.status = 'active';
+                    state.subscriptionData.startDate = new Date().toISOString();
+                    state.subscriptionData.endDate = subscriptionEndDate;
+                    
+                    // حفظ بيانات الطالب في كوليكشن students
+                    const studentData = {
+                        ...state.currentStudent,
+                        subscriptionMonths: state.subscriptionData.months,
+                        subscriptionPrice: state.subscriptionData.price,
+                        subscriptionCode: code,
+                        subscriptionStartDate: new Date().toISOString(),
+                        subscriptionEndDate: subscriptionEndDate,
+                        active: true,
+                        createdAt: new Date().toISOString(),
+                        requestId: state.requestId
+                    };
+                    
+                    await addDoc(collection(db, COLLECTIONS.STUDENTS), studentData);
+                    
+                    // تحديث localStorage
+                    const updatedState = {
+                        currentStudent: state.currentStudent,
+                        subscriptionData: state.subscriptionData,
+                        requestId: state.requestId,
+                        subscriptionCode: code,
+                        subscriptionEndDate: subscriptionEndDate
+                    };
+                    localStorage.setItem('studentRegistrationState', JSON.stringify(updatedState));
+                    
+                    showMessage('🎉 تم تفعيل الاشتراك بنجاح! يتم تحويلك الآن...', 'success');
+                    
+                    // الانتقال إلى الصفحة الرئيسية بعد ثانيتين
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 2000);
+                    
+                } else {
+                    showMessage('الكود غير صحيح، يرجى التحقق والمحاولة مرة أخرى', 'error');
+                    showLoading(false);
+                }
+                
+            } catch (error) {
+                console.error('خطأ في التحقق من الكود:', error);
+                showMessage('حدث خطأ أثناء التحقق من الكود', 'error');
+                showLoading(false);
+            }
+        });
+
+        // دوال المساعدة
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        // منع الإدخال غير الرقمي في حقل الكود
+        accessCode.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 8) {
+                this.style.background = 'rgba(76, 175, 80, 0.1)';
+                this.style.borderColor = '#4caf50';
+            } else {
+                this.style.background = '';
+                this.style.borderColor = '';
+            }
+        });
+
+        // منع الإدخال غير الرقمي في حقل الهاتف
+        document.getElementById('phoneNumber').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // إضافة رسالة تأكيد عند محاولة مغادرة الصفحة أثناء التسجيل
+        window.addEventListener('beforeunload', (e) => {
+            if (state.currentStudent && !state.subscriptionData.status === 'active') {
+                e.preventDefault();
+                e.returnValue = 'لديك طلب اشتراك قيد المعالجة. هل تريد المغادرة حقاً؟';
+            }
+        });
+    </script>
+</body>
+</html>
