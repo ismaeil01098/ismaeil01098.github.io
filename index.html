@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام المتابعة الطلابية | أ. إسماعيل عماد</title>
+    
+    <!-- خط Cairo للوضوح على الشاشات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- أيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #06b6d4;
+            --accent: #f43f5e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --glass: rgba(255, 255, 255, 0.03);
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--darker);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        /* خلفية متحركة متطورة */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(217, 70, 239, 0.1) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(1deg); }
+            66% { transform: translate(-20px, 20px) rotate(-1deg); }
+        }
+        
+        /* شبكة خلفية */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* الحاوية الرئيسية */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* الهيدر المطور */
+        .header {
+            text-align: center;
+            padding: 24px 20px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+        }
+        
+        .header-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 16px;
+            background: var(--gradient-1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+        }
+        
+        .header-icon::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            background: var(--gradient-1);
+            border-radius: 23px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(10px);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .teacher-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 12px;
+        }
+        
+        .header-subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        
+        /* البطاقات المدمجة */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), var(--shadow-glow);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #e2e8f0;
+        }
+        
+        .card-title i {
+            width: 36px;
+            height: 36px;
+            background: var(--glass);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* النماذج المطورة */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            padding-left: 44px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 15px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        
+        .form-input:focus + .input-icon {
+            color: var(--primary);
+        }
+        
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            background-size: 16px;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* شبكة الخيارات المطورة */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        @media (max-width: 400px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .option-btn {
+            padding: 12px 8px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #cbd5e1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .option-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .option-btn.selected {
+            background: var(--gradient-1);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .price-tag {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--success);
+            margin-top: 4px;
+        }
+        
+        .option-btn.selected .price-tag {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* الأزرار المطورة */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Cairo', sans-serif;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* قسم الدفع المميز */
+        .payment-highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            border-right: 3px solid var(--primary);
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #e2e8f0;
+        }
+        
+        .step-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+        
+        /* عرض المبلغ */
+        .amount-display {
+            text-align: center;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px dashed var(--success);
+            border-radius: 12px;
+            margin: 12px 0;
+        }
+        
+        .amount-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--success);
+            text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+        
+        .amount-currency {
+            font-size: 18px;
+            color: #6ee7b7;
+        }
+        
+        /* عرض الرقم المحسن - الحل الرئيسي للمشكلة */
+        .phone-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 12px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phone-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-1);
+        }
+        
+        .phone-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        /* الحل: منع التفاف النص واستخدام خط monospace */
+        .phone-number {
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--secondary);
+            letter-spacing: 2px;
+            white-space: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 0;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+        
+        /* شريط تمرير مخصص للرقم إذا احتاج */
+        .phone-number::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .phone-number::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .phone-number::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.3);
+            border-radius: 2px;
+        }
+        
+        .phone-methods {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .method-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #a5b4fc;
+        }
+        
+        /* طرق الدفع */
+        .payment-methods {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        
+        .payment-method {
+            flex: 1;
+            max-width: 140px;
+            padding: 16px 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .payment-method i {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .payment-method span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        
+        /* حقل الكود */
+        .code-input {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            letter-spacing: 8px;
+            text-align: center;
+            font-weight: 800;
+            padding: 16px;
+        }
+        
+        /* الرسائل */
+        .alert {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: #6ee7b7;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            color: #fca5a5;
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning);
+            color: #fcd34d;
+        }
+        
+        /* التحميل */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* الفوتر */
+        .footer {
+            text-align: center;
+            padding: 24px 16px;
+            margin-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: #64748b;
+            font-size: 13px;
+        }
+        
+        .footer-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+        
+        .footer-brand i {
+            color: var(--primary);
+            font-size: 20px;
+        }
+        
+        /* الأقسام */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* تأثيرات إضافية */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+        
+        /* تحسينات الهاتف */
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .header {
+                padding: 20px 16px;
+                border-radius: 20px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .header-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+            
+            .card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+            
+            .phone-number {
+                font-size: 24px;
+                letter-spacing: 1px;
+            }
+            
+            .amount-value {
+                font-size: 28px;
+            }
+            
+            .options-grid {
+                gap: 8px;
+            }
+            
+            .option-btn {
+                padding: 10px 6px;
+                font-size: 13px;
+            }
+            
+            .step {
+                padding: 12px;
+            }
+        }
+        
+        /* إخفاء العناصر */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- الخلفية المتحركة -->
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+    
+    <div class="container">
+        <!-- الهيدر -->
+        <header class="header">
+            <div class="header-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h1>نظام المتابعة الطلابية</h1>
+            <div class="teacher-badge">
+                <i class="fas fa-chalkboard-teacher"></i>
+                أ. إسماعيل عماد
+            </div>
+            <p class="header-subtitle">
+                تم إنشاء النظام بالتعاون مع أربع شركات<br>
+                بتكلفة تخطت <span class="highlight">الـ 7 آلاف جنيه شهرياً</span><br>
+                لتحسين خدمة التعليم وتطوير العملية التعليمية
+            </p>
+        </header>
+        
+        <!-- الرسائل -->
+        <div class="alert" id="message"></div>
+        
+        <!-- التحميل -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <!-- قسم التسجيل -->
+        <section class="section active" id="registrationSection">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-user-plus"></i>
+                    تسجيل الطالب الجديد
+                </h2>
+                
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label class="form-label">اسم الطالب الكامل</label>
+                        <div class="input-wrapper">
+                            <input type="text" class="form-input" id="studentName" placeholder="أدخل الاسم ثلاثي ة" required>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+                        <span class="hint">
+                            <i class="fas fa-info-circle"></i>
+                            يرجى كتابة الاسم ثلاثي كما في شهادة الميلاد
+                        </span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف</label>
+                        <div class="input-wrapper">
+                            <input type="tel" class="form-input" id="phoneNumber" placeholder="01xxxxxxxxx" required pattern="01[0-9]{9}">
+                            <i class="fas fa-phone input-icon"></i>
+                        </div>
+                        <span class="hint">
+                            <i class="fab fa-whatsapp"></i>
+                            رقم الواتساب الخاص بالطالب أو ولي الأمر
+                        </span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">المرحلة الدراسية</label>
+                        <select class="form-input" id="gradeLevel" required>
+                            <option value="">اختر المرحلة الدراسية</option>
+                            <option value="fourth">الصف الرابع الابتدائي</option>
+                            <option value="first_prep">الصف الأول الإعدادي</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group hidden" id="classSelection">
+                        <label class="form-label">الفصل الدراسي</label>
+                        <div class="options-grid" id="classOptions"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">مدة الاشتراك</label>
+                        <div class="options-grid" id="subscriptionOptions">
+                            <div class="option-btn" data-months="1" data-price="60">
+                                <div>شهر</div>
+                                <div class="price-tag">60 ج</div>
+                            </div>
+                            <div class="option-btn" data-months="2" data-price="100">
+                                <div>شهرين</div>
+                                <div class="price-tag">100 ج</div>
+                            </div>
+                            <div class="option-btn" data-months="3" data-price="140">
+                                <div>3 شهور</div>
+                                <div class="price-tag">140 ج</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedMonths" required>
+                        <input type="hidden" id="selectedPrice" required>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="subscribeBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        إشتراك الآن
+                    </button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- قسم الدفع -->
+        <section class="section" id="paymentSection">
+            <div class="card payment-highlight">
+                <h2 class="card-title">
+                    <i class="fas fa-credit-card"></i>
+                    إتمام عملية الدفع
+                </h2>
+                
+                <div class="steps-container">
+                    <!-- الخطوة 1 -->
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">المبلغ المطلوب تحويله</div>
+                            <div class="amount-display">
+                                <span class="amount-value" id="paymentAmount">-</span>
+                                <span class="amount-currency">جنيه مصري</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الخطوة 2 -->
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">إرسال المبلغ على الرقم التالي</div>
+                            <div class="phone-box">
+                                <div class="phone-label">فودافون كاش / اتصالات كاش</div>
+                                <div class="phone-number">01122104596</div>
+                                <div class="phone-methods">
+                                    <span class="method-badge"><i class="fas fa-wallet"></i> فودافون كاش</span>
+                                    <span class="method-badge"><i class="fas fa-mobile-alt"></i> اتصالات كاش</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الخطوة 3 -->
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">انتظار الكود</div>
+                            <div class="step-desc">
+                                بعد الدفع خلال 10 دقائق سيصلك كود الدخول (8 أرقام) على الواتساب
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- الخطوة 4 -->
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">أدخل كود التفعيل</div>
+                            <div class="form-group" style="margin-top: 10px;">
+                                <div class="input-wrapper">
+                                    <input type="text" class="form-input code-input" id="accessCode" 
+                                           placeholder="XXXXXXXX" maxlength="8" required>
+                                    <i class="fas fa-key input-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" id="verifyCodeBtn" style="margin-top: 8px;">
+                    <i class="fas fa-check-circle"></i>
+                    تفعيل الاشتراك
+                </button>
+                
+                <button class="btn btn-secondary" id="backToRegistration">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة للتسجيل
+                </button>
+            </div>
+        </section>
+        
+        <!-- الفوتر -->
+        <footer class="footer">
+            <div class="footer-brand">
+                <i class="fas fa-book-open"></i>
+                <span>نظام المتابعة الطلابية 2026</span>
+            </div>
+            <div>جميع الحقوق محفوظة | نسخة احترافية</div>
+            <div style="margin-top: 8px; opacity: 0.7;">
+                تم التطوير بأحدث التقنيات لتقديم أفضل تجربة تعليمية
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK - نفس الكود الأصلي بدون تغيير -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFO3F3E4vie6WA8fCA00rmRp_0_2CPq5I",
+            authDomain: "exam-1fd4a.firebaseapp.com",
+            projectId: "exam-1fd4a",
+            storageBucket: "exam-1fd4a.firebasestorage.app",
+            messagingSenderId: "861838351458",
+            appId: "1:861838351458:web:58087fe82ad951b9bac53b",
+            measurementId: "G-Q05JBNZJ3V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const state = {
+            currentStudent: null,
+            subscriptionData: null,
+            requestId: null
+        };
+
+        const COLLECTIONS = {
+            REGISTRATION_REQUESTS: 'registration_requests',
+            ACTIVE_SUBSCRIPTIONS: 'active_subscriptions',
+            STUDENTS: 'students'
+        };
+
+        const registrationSection = document.getElementById('registrationSection');
+        const paymentSection = document.getElementById('paymentSection');
+        const gradeLevel = document.getElementById('gradeLevel');
+        const classSelection = document.getElementById('classSelection');
+        const classOptions = document.getElementById('classOptions');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+        const backToRegistration = document.getElementById('backToRegistration');
+        const accessCode = document.getElementById('accessCode');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const paymentAmount = document.getElementById('paymentAmount');
+
+        const fourthGradeClasses = ['الفصل 1/4', 'الفصل 2/4', 'الفصل 3/4', 'الفصل 4/4'];
+        const firstPrepClass = 'الفصل 3/1';
+
+        gradeLevel.addEventListener('change', function() {
+            if (this.value === 'fourth') {
+                classSelection.classList.remove('hidden');
+                classOptions.innerHTML = '';
+                fourthGradeClasses.forEach(className => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option-btn';
+                    btn.textContent = className;
+                    btn.dataset.class = className;
+                    btn.onclick = () => selectClass(btn);
+                    classOptions.appendChild(btn);
+                });
+            } else if (this.value === 'first_prep') {
+                classSelection.classList.remove('hidden');
+                classOptions.innerHTML = '';
+                const btn = document.createElement('div');
+                btn.className = 'option-btn selected';
+                btn.textContent = firstPrepClass;
+                btn.dataset.class = firstPrepClass;
+                classOptions.appendChild(btn);
+                document.getElementById('selectedMonths').value = '';
+            } else {
+                classSelection.classList.add('hidden');
+            }
+        });
+
+        function selectClass(button) {
+            document.querySelectorAll('#classOptions .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+        }
+
+        document.querySelectorAll('#subscriptionOptions .option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#subscriptionOptions .option-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('selectedMonths').value = this.dataset.months;
+                document.getElementById('selectedPrice').value = this.dataset.price;
+            });
+        });
+
+        window.addEventListener('load', async () => {
+            const savedState = localStorage.getItem('studentRegistrationState');
+            
+            if (savedState) {
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    
+                    if (parsedState.subscriptionEndDate) {
+                        const endDate = new Date(parsedState.subscriptionEndDate);
+                        if (endDate > new Date()) {
+                            let studentQuery = null;
+                            
+                            if (parsedState.subscriptionCode) {
+                                studentQuery = query(
+                                    collection(db, COLLECTIONS.STUDENTS),
+                                    where("code", "==", parsedState.subscriptionCode)
+                                );
+                            } else if (parsedState.currentStudent?.phone) {
+                                studentQuery = query(
+                                    collection(db, COLLECTIONS.STUDENTS),
+                                    where("phone", "==", parsedState.currentStudent.phone)
+                                );
+                            }
+                            
+                            if (studentQuery) {
+                                const studentSnapshot = await getDocs(studentQuery);
+                                
+                                if (!studentSnapshot.empty) {
+                                    const studentDoc = studentSnapshot.docs[0];
+                                    const studentData = studentDoc.data();
+                                    
+                                    if (studentData.active) {
+                                        window.location.href = 'home.html';
+                                        return;
+                                    } else {
+                                        localStorage.removeItem('studentRegistrationState');
+                                        showMessage('حسابك غير نشط، يرجى التواصل مع الإدارة', 'error');
+                                        return;
+                                    }
+                                } else {
+                                    if (parsedState.requestId) {
+                                        state.currentStudent = parsedState.currentStudent;
+                                        state.subscriptionData = parsedState.subscriptionData;
+                                        state.requestId = parsedState.requestId;
+                                        showPaymentSection();
+                                        updatePaymentAmount();
+                                        showMessage('يبدو أن بياناتك تحتاج للتحديث، يرجى إدخال الكود مرة أخرى', 'warning');
+                                        return;
+                                    } else {
+                                        localStorage.removeItem('studentRegistrationState');
+                                        showMessage('لم يتم العثور على حسابك، يرجى التسجيل مرة أخرى', 'error');
+                                        return;
+                                    }
+                                }
+                            }
+                        } else {
+                            localStorage.removeItem('studentRegistrationState');
+                            showMessage('انتهت مدة اشتراكك، يرجى التجديد', 'warning');
+                            return;
+                        }
+                    }
+                    
+                    if (parsedState.subscriptionData && parsedState.requestId) {
+                        state.currentStudent = parsedState.currentStudent;
+                        state.subscriptionData = parsedState.subscriptionData;
+                        state.requestId = parsedState.requestId;
+                        showPaymentSection();
+                        updatePaymentAmount();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('خطأ في التحقق من الجلسة:', error);
+                    localStorage.removeItem('studentRegistrationState');
+                }
+            }
+        });
+
+        function updatePaymentAmount() {
+            if (state.subscriptionData) {
+                paymentAmount.textContent = state.subscriptionData.price;
+            }
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const selectedGrade = gradeLevel.value;
+            const selectedClassBtn = document.querySelector('#classOptions .option-btn.selected');
+            const selectedMonths = document.getElementById('selectedMonths').value;
+            const selectedPrice = document.getElementById('selectedPrice').value;
+            
+            if (!selectedClassBtn || !selectedMonths) {
+                showMessage('يرجى اختيار الفصل ومدة الاشتراك', 'error');
+                return;
+            }
+            
+            const selectedClass = selectedClassBtn.dataset.class;
+            
+            state.currentStudent = {
+                name: studentName,
+                phone: phoneNumber,
+                grade: selectedGrade,
+                class: selectedClass,
+                registrationDate: new Date().toISOString()
+            };
+            
+            state.subscriptionData = {
+                months: parseInt(selectedMonths),
+                price: parseInt(selectedPrice),
+                status: 'pending_payment',
+                paymentDate: null,
+                startDate: null,
+                endDate: null
+            };
+            
+            showLoading(true);
+            
+            try {
+                const requestData = {
+                    studentName: studentName,
+                    phone: phoneNumber,
+                    grade: selectedGrade,
+                    class: selectedClass,
+                    months: parseInt(selectedMonths),
+                    price: parseInt(selectedPrice),
+                    status: 'pending_payment',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                const docRef = await addDoc(collection(db, COLLECTIONS.REGISTRATION_REQUESTS), requestData);
+                state.requestId = docRef.id;
+                
+                localStorage.setItem('studentRegistrationState', JSON.stringify(state));
+                
+                showMessage('تم حفظ طلبك بنجاح! قم بإكمال خطوات الدفع', 'success');
+                showLoading(false);
+                
+                setTimeout(() => {
+                    showPaymentSection();
+                    updatePaymentAmount();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 800);
+                
+            } catch (error) {
+                console.error('خطأ في حفظ الطلب:', error);
+                showMessage('حدث خطأ في حفظ طلبك، يرجى المحاولة مرة أخرى', 'error');
+                showLoading(false);
+            }
+        });
+
+        function showPaymentSection() {
+            registrationSection.classList.remove('active');
+            paymentSection.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => accessCode.focus(), 100);
+        }
+
+        backToRegistration.addEventListener('click', () => {
+            paymentSection.classList.remove('active');
+            registrationSection.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        verifyCodeBtn.addEventListener('click', async () => {
+            const code = accessCode.value.trim();
+            
+            if (!code || code.length !== 8) {
+                showMessage('يرجى إدخال كود صحيح مكون من 8 أرقام', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const subscriptionsRef = collection(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS);
+                const q = query(subscriptionsRef, where("code", "==", code));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const subscriptionDoc = querySnapshot.docs[0];
+                    const subscriptionData = subscriptionDoc.data();
+                    
+                    if (subscriptionData.used) {
+                        if (subscriptionData.studentPhone === state.currentStudent?.phone) {
+                            showMessage('لقد استخدمت هذا الكود مسبقاً، يرجى الانتظار قليلاً...', 'warning');
+                            
+                            const studentCheckQuery = query(
+                                collection(db, COLLECTIONS.STUDENTS),
+                                where("phone", "==", state.currentStudent.phone)
+                            );
+                            const studentCheckSnapshot = await getDocs(studentCheckQuery);
+                            
+                            if (!studentCheckSnapshot.empty) {
+                                const studentDoc = studentCheckSnapshot.docs[0];
+                                const studentData = studentDoc.data();
+                                
+                                const endDate = new Date();
+                                endDate.setMonth(endDate.getMonth() + state.subscriptionData.months);
+                                
+                                const updatedState = {
+                                    currentStudent: state.currentStudent,
+                                    subscriptionData: state.subscriptionData,
+                                    requestId: state.requestId,
+                                    subscriptionCode: code,
+                                    subscriptionEndDate: endDate.toISOString()
+                                };
+                                localStorage.setItem('studentRegistrationState', JSON.stringify(updatedState));
+                                
+                                showMessage('تم التعرف عليك، يتم تحويلك الآن...', 'success');
+                                
+                                setTimeout(() => {
+                                    window.location.href = 'home.html';
+                                }, 2000);
+                            } else {
+                                showMessage('هذا الكود تم استخدامه مسبقاً لنفس الطالب', 'error');
+                                showLoading(false);
+                            }
+                        } else {
+                            showMessage('هذا الكود تم استخدامه مسبقاً', 'error');
+                            showLoading(false);
+                        }
+                        return;
+                    }
+                    
+                    await updateDoc(doc(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS, subscriptionDoc.id), {
+                        used: true,
+                        studentName: state.currentStudent.name,
+                        studentPhone: state.currentStudent.phone,
+                        studentClass: state.currentStudent.class,
+                        activationDate: new Date().toISOString(),
+                        requestId: state.requestId
+                    });
+                    
+                    if (state.requestId) {
+                        await updateDoc(doc(db, COLLECTIONS.REGISTRATION_REQUESTS, state.requestId), {
+                            status: 'active',
+                            code: code,
+                            paymentDate: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+                    
+                    const endDate = new Date();
+                    endDate.setMonth(endDate.getMonth() + state.subscriptionData.months);
+                    
+                    const subscriptionEndDate = endDate.toISOString();
+                    state.subscriptionData.status = 'active';
+                    state.subscriptionData.startDate = new Date().toISOString();
+                    state.subscriptionData.endDate = subscriptionEndDate;
+                    
+                    const studentData = {
+                        ...state.currentStudent,
+                        subscriptionMonths: state.subscriptionData.months,
+                        subscriptionPrice: state.subscriptionData.price,
+                        subscriptionCode: code,
+                        subscriptionStartDate: new Date().toISOString(),
+                        subscriptionEndDate: subscriptionEndDate,
+                        active: true,
+                        createdAt: new Date().toISOString(),
+                        requestId: state.requestId
+                    };
+                    
+                    await addDoc(collection(db, COLLECTIONS.STUDENTS), studentData);
+                    
+                    const updatedState = {
+                        currentStudent: state.currentStudent,
+                        subscriptionData: state.subscriptionData,
+                        requestId: state.requestId,
+                        subscriptionCode: code,
+                        subscriptionEndDate: subscriptionEndDate
+                    };
+                    localStorage.setItem('studentRegistrationState', JSON.stringify(updatedState));
+                    
+                    showMessage('🎉 تم تفعيل الاشتراك بنجاح! يتم تحويلك الآن...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 2000);
+                    
+                } else {
+                    showMessage('الكود غير صحيح، يرجى التحقق والمحاولة مرة أخرى', 'error');
+                    showLoading(false);
+                }
+                
+            } catch (error) {
+                console.error('خطأ في التحقق من الكود:', error);
+                showMessage('حدث خطأ أثناء التحقق من الكود', 'error');
+                showLoading(false);
+            }
+        });
+
+        function showMessage(text, type) {
+            message.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i> ${text}`;
+            message.className = `alert alert-${type}`;
+            message.style.display = 'flex';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        accessCode.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 8) {
+                this.style.borderColor = 'var(--success)';
+                this.style.background = 'rgba(16, 185, 129, 0.1)';
+            } else {
+                this.style.borderColor = '';
+                this.style.background = '';
+            }
+        });
+
+        document.getElementById('phoneNumber').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+</body>
+</html>

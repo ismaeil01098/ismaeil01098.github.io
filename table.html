@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>جدول الحصص - نظام المتابعة الطلابية</title>
+    
+    <!-- مكتبة الخطوط -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- أيقونات Material -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* متغيرات أساسية */
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #475569;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --transition: all 0.2s ease;
+        }
+        
+        /* إعادة التعيين */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background-color: var(--light);
+        }
+        
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* الهيدر */
+        .main-header {
+            background: var(--card-bg);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .header-content {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .header-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .header-subtitle {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        /* الحاوية الرئيسية */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        /* بطاقة الاختيار */
+        .selection-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .selection-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .option-btn {
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .option-btn.active {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* جدول الحصص */
+        .schedule-container {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .schedule-container.active {
+            display: block;
+        }
+        
+        .schedule-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        /* جدول 8x5 - معدل */
+        .class-schedule {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Cairo', sans-serif;
+            min-width: 600px;
+        }
+        
+        /* الحصص في الأعلى (صف أفقي) */
+        .class-schedule th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+            min-width: 100px;
+        }
+        
+        /* الأيام على اليمين (عمود رأسي) */
+        .class-schedule td:first-child {
+            background: var(--dark);
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+            position: sticky;
+            right: 0;
+            z-index: 10;
+            min-width: 80px;
+        }
+        
+        .class-schedule td {
+            border: 1px solid var(--border);
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+            min-width: 100px;
+            min-height: 60px;
+            position: relative;
+            background: white;
+        }
+        
+        /* خلايا فارغة (الرأس العلوي) */
+        .class-schedule thead th:first-child {
+            background: var(--dark);
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+        
+        .period-header {
+            background: var(--primary-light);
+        }
+        
+        .day-cell {
+            background: var(--light);
+            font-weight: 600;
+        }
+        
+        .add-subject-btn {
+            width: 100%;
+            height: 100%;
+            min-height: 50px;
+            background: rgba(37, 99, 235, 0.05);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-light);
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .add-subject-btn:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        .subject-display {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 8px 4px;
+            border-radius: var(--radius-sm);
+            font-family: 'Cairo', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 50px;
+        }
+        
+        .subject-display:hover {
+            opacity: 0.9;
+        }
+        
+        /* جدول الدروس */
+        .lessons-schedule {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .lessons-schedule.active {
+            display: block;
+        }
+        
+        .add-lesson-form {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-label {
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-select,
+        .form-input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .form-select:focus,
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 12px 24px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-light);
+        }
+        
+        /* قائمة الدروس */
+        .lessons-list {
+            margin-top: 20px;
+        }
+        
+        .lessons-list-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .lesson-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .lesson-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .lesson-info {
+            flex: 1;
+        }
+        
+        .lesson-subject {
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .lesson-details {
+            font-family: 'Tajawal', sans-serif;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .lesson-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .edit-btn {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+        
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        /* نافذة اختيار المادة */
+        .subject-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        
+        .subject-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .subject-option {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .subject-option:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+        
+        .subject-option.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .cancel-btn {
+            background: var(--light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .save-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background: var(--primary-light);
+        }
+        
+        /* الألوان للمواد */
+        .arabic { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .english { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .math { background: linear-gradient(135deg, #10b981, #059669); }
+        .science { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .social { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .religion { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .activity { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .games { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .library { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        
+        /* رسائل */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* تحسينات للجوال */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .class-schedule {
+                font-size: 10px;
+            }
+            
+            .class-schedule th,
+            .class-schedule td {
+                padding: 6px 4px;
+                min-width: 80px;
+            }
+            
+            .subject-display {
+                font-size: 10px;
+                padding: 6px 2px;
+                min-height: 45px;
+            }
+            
+            .add-subject-btn {
+                min-height: 45px;
+                font-size: 10px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            
+            .class-schedule {
+                font-size: 9px;
+            }
+            
+            .class-schedule th,
+            .class-schedule td {
+                min-width: 70px;
+                padding: 4px 2px;
+            }
+            
+            .subject-display {
+                font-size: 9px;
+                min-height: 40px;
+            }
+            
+            .add-subject-btn {
+                min-height: 40px;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- الهيدر -->
+    <header class="main-header">
+        <a href="home.html" class="back-btn">
+            <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+            العودة
+        </a>
+        <div class="header-content">
+            <h1 class="header-title">تنظيم جدول الدراسي</h1>
+            <p class="header-subtitle">مقدم من سيستم المتابعة الطلابية أ/ اسماعيل عماد</p>
+        </div>
+    </header>
+    
+    <!-- الحاوية الرئيسية -->
+    <main class="main-container">
+        <!-- بطاقة الاختيار -->
+        <section class="selection-card">
+            <h2 class="selection-title">اختر نوع الجدول الذي تريد إنشاءه:</h2>
+            <div class="options-grid">
+                <button class="option-btn active" id="classScheduleBtn">
+                    <div class="option-icon">🏫</div>
+                    <span>جدول حصص الفصل</span>
+                </button>
+                <button class="option-btn" id="lessonsScheduleBtn">
+                    <div class="option-icon">📚</div>
+                    <span>جدول حصص الدروس</span>
+                </button>
+            </div>
+        </section>
+        
+        <!-- جدول حصص الفصل -->
+        <section class="schedule-container active" id="classSchedule">
+            <h3 class="schedule-title">جدول حصص الفصل الدراسي</h3>
+            <div style="overflow-x: auto;">
+                <table class="class-schedule">
+                    <thead>
+                        <tr>
+                            <th>اليوم/الحصة</th>
+                            <!-- الحصص في الأعلى -->
+                            <th>الحصة 1</th>
+                            <th>الحصة 2</th>
+                            <th>الحصة 3</th>
+                            <th>الحصة 4</th>
+                            <th>الحصة 5</th>
+                            <th>الحصة 6</th>
+                            <th>الحصة 7</th>
+                            <th>الحصة 8</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classScheduleBody">
+                        <!-- سيتم تعبئته بالجافاسكريبت -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- جدول حصص الدروس -->
+        <section class="lessons-schedule" id="lessonsSchedule">
+            <!-- نموذج إضافة درس -->
+            <div class="add-lesson-form">
+                <h3 class="form-title">
+                    <span class="material-icons">add_circle</span>
+                    إضافة ميعاد درس جديد
+                </h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">المادة</label>
+                        <select class="form-select" id="lessonSubject">
+                            <option value="">اختر المادة</option>
+                            <option value="لغة عربية">لغة عربية</option>
+                            <option value="لغة انجليزية">لغة انجليزية</option>
+                            <option value="رياضيات">رياضيات</option>
+                            <option value="دراسات اجتماعية">دراسات اجتماعية</option>
+                            <option value="علوم">علوم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">اليوم</label>
+                        <select class="form-select" id="lessonDay">
+                            <option value="">اختر اليوم</option>
+                            <option value="الأحد">الأحد</option>
+                            <option value="الاثنين">الاثنين</option>
+                            <option value="الثلاثاء">الثلاثاء</option>
+                            <option value="الأربعاء">الأربعاء</option>
+                            <option value="الخميس">الخميس</option>
+                            <option value="الجمعة">الجمعة</option>
+                            <option value="السبت">السبت</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الساعة</label>
+                        <input type="time" class="form-input" id="lessonTime">
+                    </div>
+                </div>
+                <button class="submit-btn" id="addLessonBtn">
+                    <span class="material-icons">save</span>
+                    حفظ الميعاد
+                </button>
+            </div>
+            
+            <!-- قائمة الدروس -->
+            <div class="lessons-list">
+                <h3 class="lessons-list-title">
+                    <span class="material-icons">schedule</span>
+                    مواعيد الدروس المحفوظة
+                </h3>
+                <div id="lessonsList">
+                    <!-- سيتم تعبئتها بالجافاسكريبت -->
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- نافذة اختيار المادة -->
+    <div class="subject-modal" id="subjectModal">
+        <div class="modal-content">
+            <h3 class="modal-title">اختر المادة الدراسية</h3>
+            <div class="subjects-grid" id="subjectsGrid">
+                <!-- سيتم تعبئته بالجافاسكريبت -->
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" id="cancelSubject">إلغاء</button>
+                <button class="modal-btn save-btn" id="saveSubject">تأكيد</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- رسالة -->
+    <div class="message" id="message"></div>
+    
+    <script>
+        // متغيرات التطبيق
+        let currentCell = null;
+        let selectedSubject = null;
+        let currentScheduleType = 'class'; // 'class' أو 'lessons'
+        let editingLessonId = null;
+        
+        // المواد الدراسية
+        const subjects = [
+            { name: 'لغة عربية', class: 'arabic', color: '#3b82f6' },
+            { name: 'لغة انجليزية', class: 'english', color: '#ef4444' },
+            { name: 'علوم', class: 'science', color: '#f59e0b' },
+            { name: 'دراسات اجتماعية', class: 'social', color: '#8b5cf6' },
+            { name: 'رياضيات', class: 'math', color: '#10b981' },
+            { name: 'دين', class: 'religion', color: '#ec4899' },
+            { name: 'نشاط', class: 'activity', color: '#14b8a6' },
+            { name: 'العاب', class: 'games', color: '#f97316' },
+            { name: 'مكتبة', class: 'library', color: '#6366f1' }
+        ];
+        
+        // الأيام الدراسية على اليمين
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+        const periods = 8;
+        
+        // العناصر DOM
+        const classScheduleBtn = document.getElementById('classScheduleBtn');
+        const lessonsScheduleBtn = document.getElementById('lessonsScheduleBtn');
+        const classSchedule = document.getElementById('classSchedule');
+        const lessonsSchedule = document.getElementById('lessonsSchedule');
+        const classScheduleBody = document.getElementById('classScheduleBody');
+        const subjectModal = document.getElementById('subjectModal');
+        const subjectsGrid = document.getElementById('subjectsGrid');
+        const cancelSubject = document.getElementById('cancelSubject');
+        const saveSubject = document.getElementById('saveSubject');
+        const message = document.getElementById('message');
+        const addLessonBtn = document.getElementById('addLessonBtn');
+        const lessonsList = document.getElementById('lessonsList');
+        
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            initClassSchedule();
+            loadClassSchedule();
+            loadLessons();
+            setupEventListeners();
+        });
+        
+        // تهيئة جدول حصص الفصل - معدل
+        function initClassSchedule() {
+            classScheduleBody.innerHTML = '';
+            
+            // إنشاء صف لكل يوم (الأيام على اليمين)
+            for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
+                const row = document.createElement('tr');
+                
+                // خلية اليوم (في العمود الأول)
+                const dayCell = document.createElement('td');
+                dayCell.className = 'day-cell';
+                dayCell.textContent = days[dayIndex];
+                row.appendChild(dayCell);
+                
+                // خلايا الحصص لكل يوم (8 خلايا)
+                for (let period = 1; period <= periods; period++) {
+                    const cell = document.createElement('td');
+                    cell.dataset.day = days[dayIndex];
+                    cell.dataset.period = period;
+                    
+                    // زر إضافة المادة
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'add-subject-btn';
+                    addBtn.innerHTML = `
+                        <span class="material-icons" style="font-size: 16px;">add</span>
+                        إضافة
+                    `;
+                    addBtn.addEventListener('click', () => openSubjectModal(cell));
+                    
+                    cell.appendChild(addBtn);
+                    row.appendChild(cell);
+                }
+                
+                classScheduleBody.appendChild(row);
+            }
+        }
+        
+        // فتح نافذة اختيار المادة
+        function openSubjectModal(cell) {
+            currentCell = cell;
+            selectedSubject = null;
+            
+            // تعبئة خيارات المواد
+            subjectsGrid.innerHTML = '';
+            subjects.forEach(subject => {
+                const subjectOption = document.createElement('div');
+                subjectOption.className = 'subject-option';
+                subjectOption.textContent = subject.name;
+                subjectOption.dataset.subject = subject.name;
+                subjectOption.dataset.class = subject.class;
+                
+                // التحقق إذا كانت هذه المادة موجودة في الخلية
+                const existingSubject = cell.querySelector('.subject-display');
+                if (existingSubject && existingSubject.textContent.includes(subject.name)) {
+                    subjectOption.classList.add('selected');
+                    selectedSubject = subject.name;
+                }
+                
+                subjectOption.addEventListener('click', () => {
+                    // إزالة التحديد السابق
+                    document.querySelectorAll('.subject-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // تحديد الخيار الجديد
+                    subjectOption.classList.add('selected');
+                    selectedSubject = subject.name;
+                });
+                
+                subjectsGrid.appendChild(subjectOption);
+            });
+            
+            subjectModal.classList.add('active');
+        }
+        
+        // حفظ المادة في الجدول
+        function saveSubjectToSchedule() {
+            if (!selectedSubject || !currentCell) {
+                showMessage('يرجى اختيار مادة أولاً');
+                return;
+            }
+            
+            // إيجاد معلومات المادة
+            const subjectInfo = subjects.find(s => s.name === selectedSubject);
+            
+            // إزالة زر الإضافة إن وجد
+            const addBtn = currentCell.querySelector('.add-subject-btn');
+            if (addBtn) addBtn.remove();
+            
+            // إنشاء عنصر عرض المادة
+            const subjectDisplay = document.createElement('div');
+            subjectDisplay.className = `subject-display ${subjectInfo.class}`;
+            subjectDisplay.textContent = selectedSubject;
+            subjectDisplay.title = `اضغط للتعديل: ${selectedSubject}`;
+            
+            // إضافة زر حذف صغير
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'material-icons';
+            deleteIcon.textContent = 'close';
+            deleteIcon.style.fontSize = '14px';
+            deleteIcon.style.marginRight = '4px';
+            deleteIcon.style.cursor = 'pointer';
+            deleteIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeSubjectFromCell(currentCell);
+            });
+            
+            subjectDisplay.insertBefore(deleteIcon, subjectDisplay.firstChild);
+            
+            // إضافة حدث النقر للتعديل
+            subjectDisplay.addEventListener('click', () => openSubjectModal(currentCell));
+            
+            // إضافة المادة إلى الخلية
+            currentCell.appendChild(subjectDisplay);
+            
+            // حفظ في localStorage
+            saveClassSchedule();
+            
+            // إغلاق النافذة
+            subjectModal.classList.remove('active');
+            showMessage('تم حفظ المادة بنجاح');
+        }
+        
+        // إزالة المادة من الخلية
+        function removeSubjectFromCell(cell) {
+            const subjectDisplay = cell.querySelector('.subject-display');
+            if (subjectDisplay) {
+                subjectDisplay.remove();
+                
+                // إعادة زر الإضافة
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-subject-btn';
+                addBtn.innerHTML = `
+                    <span class="material-icons" style="font-size: 16px;">add</span>
+                    إضافة
+                `;
+                addBtn.addEventListener('click', () => openSubjectModal(cell));
+                
+                cell.appendChild(addBtn);
+                
+                // حفظ التغييرات
+                saveClassSchedule();
+                showMessage('تم حذف المادة');
+            }
+        }
+        
+        // حفظ جدول الفصل في localStorage
+        function saveClassSchedule() {
+            const scheduleData = {};
+            
+            // جمع بيانات الجدول
+            document.querySelectorAll('.class-schedule td[data-day]').forEach(cell => {
+                const day = cell.dataset.day;
+                const period = cell.dataset.period;
+                const subjectDisplay = cell.querySelector('.subject-display');
+                
+                if (subjectDisplay) {
+                    const subject = subjectDisplay.textContent.trim();
+                    scheduleData[`${day}_${period}`] = subject;
+                }
+            });
+            
+            localStorage.setItem('classSchedule', JSON.stringify(scheduleData));
+        }
+        
+        // تحميل جدول الفصل من localStorage
+        function loadClassSchedule() {
+            const savedSchedule = localStorage.getItem('classSchedule');
+            if (!savedSchedule) return;
+            
+            const scheduleData = JSON.parse(savedSchedule);
+            
+            document.querySelectorAll('.class-schedule td[data-day]').forEach(cell => {
+                const day = cell.dataset.day;
+                const period = cell.dataset.period;
+                const key = `${day}_${period}`;
+                
+                if (scheduleData[key]) {
+                    const subjectName = scheduleData[key];
+                    const subjectInfo = subjects.find(s => s.name === subjectName);
+                    
+                    if (subjectInfo) {
+                        // إزالة زر الإضافة
+                        const addBtn = cell.querySelector('.add-subject-btn');
+                        if (addBtn) addBtn.remove();
+                        
+                        // إنشاء عنصر عرض المادة
+                        const subjectDisplay = document.createElement('div');
+                        subjectDisplay.className = `subject-display ${subjectInfo.class}`;
+                        subjectDisplay.textContent = subjectName;
+                        subjectDisplay.title = `اضغط للتعديل: ${subjectName}`;
+                        
+                        // إضافة زر حذف
+                        const deleteIcon = document.createElement('span');
+                        deleteIcon.className = 'material-icons';
+                        deleteIcon.textContent = 'close';
+                        deleteIcon.style.fontSize = '14px';
+                        deleteIcon.style.marginRight = '4px';
+                        deleteIcon.style.cursor = 'pointer';
+                        deleteIcon.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            removeSubjectFromCell(cell);
+                        });
+                        
+                        subjectDisplay.insertBefore(deleteIcon, subjectDisplay.firstChild);
+                        subjectDisplay.addEventListener('click', () => openSubjectModal(cell));
+                        
+                        cell.appendChild(subjectDisplay);
+                    }
+                }
+            });
+        }
+        
+        // إضافة درس جديد
+        function addLesson() {
+            const subject = document.getElementById('lessonSubject').value;
+            const day = document.getElementById('lessonDay').value;
+            const time = document.getElementById('lessonTime').value;
+            
+            if (!subject || !day || !time) {
+                showMessage('يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            const lesson = {
+                id: Date.now(),
+                subject,
+                day,
+                time,
+                createdAt: new Date().toISOString()
+            };
+            
+            // إذا كان في وضع التعديل
+            if (editingLessonId) {
+                updateLesson(editingLessonId, lesson);
+            } else {
+                // حفظ الدرس
+                saveLesson(lesson);
+            }
+            
+            // إعادة تعيين النموذج
+            document.getElementById('lessonSubject').value = '';
+            document.getElementById('lessonDay').value = '';
+            document.getElementById('lessonTime').value = '';
+            editingLessonId = null;
+            addLessonBtn.innerHTML = '<span class="material-icons">save</span> حفظ الميعاد';
+            
+            // إعادة تحميل القائمة
+            loadLessons();
+            showMessage('تم حفظ الميعاد بنجاح');
+        }
+        
+        // حفظ درس في localStorage
+        function saveLesson(lesson) {
+            let lessons = JSON.parse(localStorage.getItem('lessonsSchedule')) || [];
+            lessons.push(lesson);
+            localStorage.setItem('lessonsSchedule', JSON.stringify(lessons));
+        }
+        
+        // تحديث درس
+        function updateLesson(id, updatedLesson) {
+            let lessons = JSON.parse(localStorage.getItem('lessonsSchedule')) || [];
+            const index = lessons.findIndex(lesson => lesson.id === id);
+            
+            if (index !== -1) {
+                lessons[index] = { ...updatedLesson, id };
+                localStorage.setItem('lessonsSchedule', JSON.stringify(lessons));
+            }
+        }
+        
+        // حذف درس
+        function deleteLesson(id) {
+            let lessons = JSON.parse(localStorage.getItem('lessonsSchedule')) || [];
+            lessons = lessons.filter(lesson => lesson.id !== id);
+            localStorage.setItem('lessonsSchedule', JSON.stringify(lessons));
+            loadLessons();
+            showMessage('تم حذف الميعاد');
+        }
+        
+        // تحميل قائمة الدروس
+        function loadLessons() {
+            const lessons = JSON.parse(localStorage.getItem('lessonsSchedule')) || [];
+            lessonsList.innerHTML = '';
+            
+            if (lessons.length === 0) {
+                lessonsList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-light); font-family: 'Tajawal';">
+                        لا توجد مواعيد دروس محفوظة
+                    </div>
+                `;
+                return;
+            }
+            
+            // ترتيب الدروس حسب اليوم والوقت
+            const dayOrder = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            lessons.sort((a, b) => {
+                const dayDiff = dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+                if (dayDiff !== 0) return dayDiff;
+                return a.time.localeCompare(b.time);
+            });
+            
+            lessons.forEach(lesson => {
+                const lessonItem = document.createElement('div');
+                lessonItem.className = 'lesson-item';
+                lessonItem.innerHTML = `
+                    <div class="lesson-info">
+                        <div class="lesson-subject">${lesson.subject}</div>
+                        <div class="lesson-details">${lesson.day} - ${lesson.time}</div>
+                    </div>
+                    <div class="lesson-actions">
+                        <button class="action-btn edit-btn" data-id="${lesson.id}">
+                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${lesson.id}">
+                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                        </button>
+                    </div>
+                `;
+                
+                lessonsList.appendChild(lessonItem);
+            });
+            
+            // إضافة أحداث للأزرار
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    editLesson(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    if (confirm('هل أنت متأكد من حذف هذا الميعاد؟')) {
+                        deleteLesson(id);
+                    }
+                });
+            });
+        }
+        
+        // تعديل درس
+        function editLesson(id) {
+            const lessons = JSON.parse(localStorage.getItem('lessonsSchedule')) || [];
+            const lesson = lessons.find(l => l.id === id);
+            
+            if (lesson) {
+                document.getElementById('lessonSubject').value = lesson.subject;
+                document.getElementById('lessonDay').value = lesson.day;
+                document.getElementById('lessonTime').value = lesson.time;
+                
+                editingLessonId = id;
+                addLessonBtn.innerHTML = '<span class="material-icons">update</span> تحديث الميعاد';
+                
+                // التمرير للنموذج
+                document.getElementById('lessonSubject').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // تبديل بين الجدولين
+        function switchSchedule(type) {
+            // تحديث الأزرار
+            classScheduleBtn.classList.toggle('active', type === 'class');
+            lessonsScheduleBtn.classList.toggle('active', type === 'lessons');
+            
+            // إظهار/إخفاء الجداول
+            classSchedule.classList.toggle('active', type === 'class');
+            lessonsSchedule.classList.toggle('active', type === 'lessons');
+            
+            currentScheduleType = type;
+        }
+        
+        // إعداد أحداث المستخدم
+        function setupEventListeners() {
+            // أحداث أزرار الاختيار
+            classScheduleBtn.addEventListener('click', () => switchSchedule('class'));
+            lessonsScheduleBtn.addEventListener('click', () => switchSchedule('lessons'));
+            
+            // أحداث نافذة المواد
+            cancelSubject.addEventListener('click', () => {
+                subjectModal.classList.remove('active');
+            });
+            
+            saveSubject.addEventListener('click', saveSubjectToSchedule);
+            
+            // حدث إضافة درس
+            addLessonBtn.addEventListener('click', addLesson);
+            
+            // إغلاق نافذة المواد بالضغط خارجها
+            subjectModal.addEventListener('click', (e) => {
+                if (e.target === subjectModal) {
+                    subjectModal.classList.remove('active');
+                }
+            });
+        }
+        
+        // عرض رسالة
+        function showMessage(text) {
+            message.textContent = text;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // تصدير للاستخدام العام
+        window.showMessage = showMessage;
+    </script>
+</body>
+</html>
