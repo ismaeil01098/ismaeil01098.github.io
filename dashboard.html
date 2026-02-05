@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام المتابعة الطلابية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d47a1 0%, #1a237e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            color: #b0b0b0;
+            margin-bottom: 20px;
+        }
+        
+        /* تبادل الصفحات */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* شريط التنقل */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+        }
+        
+        .tab-btn {
+            padding: 14px 10px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+            font-weight: bold;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
+        }
+        
+        /* بطاقات */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* نماذج */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #5c6bc0;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
+        }
+        
+        input::placeholder {
+            color: #b0b0b0;
+        }
+        
+        /* أزرار */
+        .btn {
+            padding: 16px 30px;
+            background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        
+        .btn-full {
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        /* توليد الكود */
+        .code-generator {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        
+        .code-display {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #4caf50;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* قائمة الطلاب */
+        .students-list {
+            margin-top: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .student-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .student-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(-5px);
+            border-color: rgba(92, 107, 192, 0.5);
+        }
+        
+        .student-item.selected {
+            background: rgba(92, 107, 192, 0.2);
+            border-color: #5c6bc0;
+            transform: translateX(-8px);
+        }
+        
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .student-name {
+            font-size: 19px;
+            font-weight: bold;
+            color: #bbdefb;
+        }
+        
+        .student-code {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 15px;
+            color: #c8e6c9;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            font-size: 15px;
+            color: #b0b0b0;
+        }
+        
+        .student-info span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        /* تعديل الطالب */
+        .student-edit-form {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .grades-container {
+            margin-top: 20px;
+        }
+        
+        .grade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        /* إحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4caf50;
+            margin: 15px 0;
+        }
+        
+        .stat-label {
+            font-size: 15px;
+            color: #b0b0b0;
+        }
+        
+        /* فصول */
+        .class-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .class-btn {
+            padding: 18px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .class-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .class-btn.selected {
+            background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+            border-color: #5c6bc0;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(92, 107, 192, 0.3);
+        }
+        
+        /* أخبار الفصول */
+        .class-news-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        /* رسائل */
+        .message {
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border: 1px solid;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .error {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(211, 47, 47, 0.2));
+            border-color: #f44336;
+            color: #ffcdd2;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(56, 142, 60, 0.2));
+            border-color: #4caf50;
+            color: #c8e6c9;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .loading span {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            margin: 0 8px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            animation: loading 1.4s infinite ease-in-out both;
+        }
+        
+        .loading span:nth-child(1) { animation-delay: -0.32s; }
+        .loading span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes loading {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+        
+        /* تذييل */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-generator {
+                flex-direction: column;
+            }
+            
+            .class-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>لوحة تحكم نظام المتابعة الطلابية</h1>
+            <div class="subtitle">أ/ اسماعيل عماد - التحكم الكامل في النظام</div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-page="addStudent">إضافة طالب</button>
+            <button class="tab-btn" data-page="classControl">التحكم في الفصول</button>
+            <button class="tab-btn" data-page="editStudent">تعديل طالب</button>
+            <button class="tab-btn" data-page="stats">الإحصائيات</button>
+        </div>
+        
+        <div class="message" id="message"></div>
+        <div class="loading" id="loading">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <!-- صفحة إضافة طالب -->
+        <div class="page active" id="addStudentPage">
+            <div class="card">
+                <h2>إضافة طالب جديد</h2>
+                
+                <div class="form-group">
+                    <label for="studentName">اسم الطالب</label>
+                    <input type="text" id="studentName" placeholder="أدخل اسم الطالب الكامل">
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentPhone">رقم الهاتف</label>
+                    <input type="tel" id="studentPhone" placeholder="01xxxxxxxxx">
+                </div>
+                
+                <div class="form-group">
+                    <label>الفصل الدراسي</label>
+                    <div class="class-options">
+                        <div class="class-btn" data-class="1/4">الفصل 1/4</div>
+                        <div class="class-btn" data-class="2/4">الفصل 2/4</div>
+                        <div class="class-btn" data-class="3/4">الفصل 3/4</div>
+                        <div class="class-btn" data-class="4/4">الفصل 4/4</div>
+                        <div class="class-btn" data-class="3/1">الصف الأول الإعدادي</div>
+                    </div>
+                    <input type="hidden" id="selectedClass">
+                </div>
+                
+                <div class="form-group">
+                    <label>مدة الاشتراك</label>
+                    <div class="class-options">
+                        <div class="class-btn" data-months="1">شهر واحد - 60 ج</div>
+                        <div class="class-btn" data-months="2">شهرين - 100 ج</div>
+                        <div class="class-btn" data-months="3">3 شهور - 140 ج</div>
+                    </div>
+                    <input type="hidden" id="selectedMonths">
+                </div>
+                
+                <div class="form-group">
+                    <label>كود الدخول</label>
+                    <div class="code-generator">
+                        <div class="code-display" id="generatedCode">00000000</div>
+                        <button class="btn" id="generateCodeBtn">توليد كود جديد</button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-full" id="addStudentBtn">إضافة الطالب</button>
+            </div>
+            
+            <div class="card">
+                <h2>الطلاب المضافين</h2>
+                <div class="students-list" id="studentsList">
+                    <!-- سيتم تعبئتها بالبيانات -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- صفحة التحكم في الفصول -->
+        <div class="page" id="classControlPage">
+            <div class="card">
+                <h2>التحكم في أخبار الفصول والمدرسة</h2>
+                
+                <div class="form-group">
+                    <label>اختر الفصل</label>
+                    <div class="class-options">
+                        <div class="class-btn class-selector" data-class="1/4">الفصل 1/4</div>
+                        <div class="class-btn class-selector" data-class="2/4">الفصل 2/4</div>
+                        <div class="class-btn class-selector" data-class="3/4">الفصل 3/4</div>
+                        <div class="class-btn class-selector" data-class="4/4">الفصل 4/4</div>
+                        <div class="class-btn class-selector" data-class="3/1">الصف الأول الإعدادي</div>
+                        <div class="class-btn class-selector" data-class="school">أخبار المدرسة العامة</div>
+                    </div>
+                </div>
+                
+                <div id="currentClassInfo" style="margin-bottom: 25px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 10px; display: none;">
+                    <h3>معلومات الفصل الحالية</h3>
+                    <div id="classInfoDisplay"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classNews">أخبار الفصل/المدرسة</label>
+                    <textarea id="classNews" placeholder="اكتب أخبار الفصل أو المدرسة هنا..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classHomework">واجب الفصل</label>
+                    <textarea id="classHomework" placeholder="اكتب واجب الفصل هنا..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="groupHomework">واجب المجموعات الدراسية</label>
+                    <div class="form-row">
+                        <input type="text" id="saturdayGroup" placeholder="واجب مجموعة السبت">
+                        <input type="text" id="tuesdayGroup" placeholder="واجب مجموعة الثلاثاء">
+                        <input type="text" id="thursdayGroup" placeholder="واجب مجموعة الخميس">
+                    </div>
+                </div>
+                
+                <button class="btn btn-full btn-secondary" id="saveClassInfoBtn">حفظ معلومات الفصل</button>
+            </div>
+        </div>
+        
+        <!-- صفحة تعديل طالب -->
+        <div class="page" id="editStudentPage">
+            <div class="card">
+                <h2>تعديل بيانات ومستوى الطالب</h2>
+                
+                <div class="form-group">
+                    <label for="searchStudent">ابحث عن الطالب</label>
+                    <input type="text" id="searchStudent" placeholder="ابحث بالاسم أو الكود أو رقم الهاتف...">
+                    <div style="margin-top: 10px; font-size: 14px; color: #b0b0b0;">
+                        ابدأ بالكتابة للبحث عن طالب، ثم انقر على الطالب لتعديل بياناته
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="students-list"></div>
+                
+                <div id="studentEditForm" style="display: none;">
+                    <div class="student-edit-form">
+                        <h3 id="editingStudentName"></h3>
+                        <div class="student-info" id="editingStudentInfo" style="margin-bottom: 20px;"></div>
+                        
+                        <div class="form-group">
+                            <label>درجات الطالب</label>
+                            <div class="form-row">
+                                <input type="text" id="gradeTitle" placeholder="عنوان الدرجة (مثل: اختبار شهر نوفمبر)">
+                                <input type="number" id="gradeValue" placeholder="قيمة الدرجة (من 100)">
+                            </div>
+                            <button class="btn btn-small" id="addGradeBtn">إضافة درجة</button>
+                            <div class="grades-container" id="gradesList"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studentLevel">مستوى الطالب ونصائح الاستاذ</label>
+                            <textarea id="studentLevel" placeholder="اكتب تقييم مستوى الطالب والنصائح..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studentBehavior">سلوك الطالب ونصائح للتعامل</label>
+                            <textarea id="studentBehavior" placeholder="اكتب تقييم السلوك والنصائح..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studentHomeworkStatus">حالة الواجب (خاص بالطالب)</label>
+                            <select id="studentHomeworkStatus">
+                                <option value="">اختر حالة الواجب</option>
+                                <option value="ممتاز">ممتاز - ينجز جميع الواجبات</option>
+                                <option value="جيد">جيد - ينجز معظم الواجبات</option>
+                                <option value="متوسط">متوسط - يحتاج متابعة</option>
+                                <option value="ضعيف">ضعيف - يحتاج تحسين</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <button class="btn btn-secondary btn-full" id="saveStudentInfoBtn">حفظ معلومات الطالب</button>
+                            <button class="btn btn-danger btn-full" id="deleteStudentBtn">حذف الطالب</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- صفحة الإحصائيات -->
+        <div class="page" id="statsPage">
+            <div class="card">
+                <h2>الإحصائيات والإعدادات</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">إجمالي الطلاب</div>
+                        <div class="stat-value" id="totalStudents">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">طلاب نشطين</div>
+                        <div class="stat-value" id="activeStudents">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">طلاب على وشك الانتهاء</div>
+                        <div class="stat-value" id="expiringStudents">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">إجمالي الإيرادات</div>
+                        <div class="stat-value" id="totalRevenue">0 ج</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 25px;">
+                    <h3>طلاب على وشك انتهاء الاشتراك (أقل من 3 أيام)</h3>
+                    <div id="expiringSoonList" class="students-list"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>إعدادات النظام</h3>
+                    <div class="form-group">
+                        <button class="btn btn-danger btn-full" id="deactivateExpiredBtn">تعطيل الطلاب المنتهية اشتراكاتهم</button>
+                        <div style="margin-top: 10px; font-size: 14px; color: #b0b0b0;">
+                            هذا الإجراء سيعطل الطلاب المنتهية اشتراكاتهم فقط ولن يحذفهم
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-full" id="exportDataBtn">📥 تصدير البيانات</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-danger btn-full" id="deleteExpiredBtn" style="background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);">
+                            ⚠️ حذف الطلاب المنتهية اشتراكاتهم نهائياً
+                        </button>
+                        <div style="margin-top: 10px; font-size: 14px; color: #ffcdd2;">
+                            تحذير: هذا الإجراء سيقوم بحذف الطلاب المنتهية اشتراكاتهم نهائياً من قاعدة البيانات
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2026 نظام المتابعة الطلابية - النسخة الاحترافية
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            query, 
+            where, 
+            doc, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc,
+            getDoc,
+            serverTimestamp,
+            orderBy,
+            limit
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFO3F3E4vie6WA8fCA00rmRp_0_2CPq5I",
+            authDomain: "exam-1fd4a.firebaseapp.com",
+            projectId: "exam-1fd4a",
+            storageBucket: "exam-1fd4a.firebasestorage.app",
+            messagingSenderId: "861838351458",
+            appId: "1:861838351458:web:58087fe82ad951b9bac53b",
+            measurementId: "G-Q05JBNZJ3V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // الكوليكشنات المطلوبة
+        const COLLECTIONS = {
+            STUDENTS: 'students',
+            ACTIVE_SUBSCRIPTIONS: 'active_subscriptions',
+            CLASS_INFO: 'class_information',
+            STUDENT_DATA: 'student_data',
+            STUDENT_GRADES: 'student_grades'
+        };
+
+        // حالة التطبيق
+        let currentEditingStudent = null;
+        let currentStudentData = null;
+        let selectedClassForNews = null;
+
+        // DOM Elements
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const pages = document.querySelectorAll('.page');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        // توليد كود 8 أرقام عشوائية
+        function generateRandomCode() {
+            return Math.floor(10000000 + Math.random() * 90000000).toString();
+        }
+
+        // تحديث عرض الكود
+        document.getElementById('generateCodeBtn').addEventListener('click', () => {
+            document.getElementById('generatedCode').textContent = generateRandomCode();
+        });
+
+        // تهيئة كود عشوائي عند التحميل
+        document.getElementById('generatedCode').textContent = generateRandomCode();
+
+        // اختيار الفصل (إضافة طالب)
+        document.querySelectorAll('.class-btn[data-class]').forEach(btn => {
+            if (!btn.classList.contains('class-selector')) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.class-btn[data-class]').forEach(b => {
+                        b.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    document.getElementById('selectedClass').value = this.dataset.class;
+                });
+            }
+        });
+
+        // اختيار مدة الاشتراك
+        document.querySelectorAll('.class-btn[data-months]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.class-btn[data-months]').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('selectedMonths').value = this.dataset.months;
+            });
+        });
+
+        // اختيار الفصل (للأخبار)
+        document.querySelectorAll('.class-selector').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                document.querySelectorAll('.class-selector').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedClassForNews = this.dataset.class;
+                await loadClassInfo(selectedClassForNews);
+            });
+        });
+
+        // تبديل الصفحات
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const pageId = this.dataset.page;
+                
+                // تحديث الأزرار النشطة
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // إظهار الصفحة المطلوبة
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === pageId + 'Page') {
+                        page.classList.add('active');
+                        
+                        // تحميل البيانات عند التبديل للصفحات
+                        if (pageId === 'addStudent') {
+                            loadStudents();
+                        }
+                        if (pageId === 'stats') {
+                            loadStatistics();
+                        }
+                        if (pageId === 'classControl') {
+                            // اختيار أول فصل افتراضياً
+                            const firstClassBtn = document.querySelector('.class-selector');
+                            if (firstClassBtn && !selectedClassForNews) {
+                                firstClassBtn.click();
+                            }
+                        }
+                    }
+                });
+            });
+        });
+
+        // إضافة طالب جديد
+        document.getElementById('addStudentBtn').addEventListener('click', async () => {
+            const studentName = document.getElementById('studentName').value;
+            const studentPhone = document.getElementById('studentPhone').value;
+            const selectedClass = document.getElementById('selectedClass').value;
+            const selectedMonths = document.getElementById('selectedMonths').value;
+            const generatedCode = document.getElementById('generatedCode').textContent;
+            
+            if (!studentName || !studentPhone || !selectedClass || !selectedMonths) {
+                showMessage('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // حساب تاريخ الانتهاء
+                const endDate = new Date();
+                endDate.setMonth(endDate.getMonth() + parseInt(selectedMonths));
+                
+                // حساب السعر بناءً على المدة
+                const price = selectedMonths === '1' ? 60 : selectedMonths === '2' ? 100 : 140;
+                
+                // إضافة الكود إلى active_subscriptions
+                const subscriptionData = {
+                    code: generatedCode,
+                    used: false,
+                    months: parseInt(selectedMonths),
+                    price: price,
+                    createdAt: new Date().toISOString(),
+                    createdBy: 'dashboard'
+                };
+                
+                await addDoc(collection(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS), subscriptionData);
+                
+                // إضافة الطالب إلى students collection
+                const studentData = {
+                    name: studentName,
+                    phone: studentPhone,
+                    class: selectedClass,
+                    code: generatedCode,
+                    months: parseInt(selectedMonths),
+                    startDate: new Date().toISOString(),
+                    endDate: endDate.toISOString(),
+                    active: true,
+                    createdAt: new Date().toISOString(),
+                    subscriptionPrice: price,
+                    createdBy: 'dashboard'
+                };
+                
+                const studentDocRef = await addDoc(collection(db, COLLECTIONS.STUDENTS), studentData);
+                
+                // إنشاء سجل بيانات للطالب في student_data
+                const studentInfoData = {
+                    studentId: studentDocRef.id,
+                    studentName: studentName,
+                    studentPhone: studentPhone,
+                    studentClass: selectedClass,
+                    level: '',
+                    behavior: '',
+                    homeworkStatus: '',
+                    grades: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                await addDoc(collection(db, COLLECTIONS.STUDENT_DATA), studentInfoData);
+                
+                showMessage(`تم إضافة الطالب ${studentName} بنجاح وتوليد الكود ${generatedCode}`, 'success');
+                
+                // إعادة تعيين النموذج
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentPhone').value = '';
+                document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('generatedCode').textContent = generateRandomCode();
+                
+                // تحديث قائمة الطلاب
+                await loadStudents();
+                
+            } catch (error) {
+                console.error('خطأ في إضافة الطالب:', error);
+                showMessage('حدث خطأ في إضافة الطالب', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // تحميل قائمة الطلاب
+        async function loadStudents() {
+            try {
+                showLoading(true);
+                const q = query(collection(db, COLLECTIONS.STUDENTS), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                const studentsList = document.getElementById('studentsList');
+                studentsList.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    studentsList.innerHTML = '<div style="text-align: center; padding: 40px; color: #b0b0b0;">لا يوجد طلاب مضافين حتى الآن</div>';
+                    showLoading(false);
+                    return;
+                }
+                
+                querySnapshot.forEach(doc => {
+                    const student = doc.data();
+                    const studentItem = createStudentItem(doc.id, student);
+                    studentsList.appendChild(studentItem);
+                });
+                
+                showLoading(false);
+            } catch (error) {
+                console.error('خطأ في تحميل الطلاب:', error);
+                showMessage('حدث خطأ في تحميل قائمة الطلاب', 'error');
+                showLoading(false);
+            }
+        }
+
+        // إنشاء عنصر طالب
+        function createStudentItem(id, student) {
+            const studentItem = document.createElement('div');
+            studentItem.className = 'student-item';
+            studentItem.dataset.id = id;
+            
+            const endDate = new Date(student.endDate);
+            const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+            const status = student.active ? (daysLeft > 0 ? 'نشط' : 'منتهي') : 'معطل';
+            const statusColor = student.active ? (daysLeft > 0 ? '#4caf50' : '#ff9800') : '#f44336';
+            
+            studentItem.innerHTML = `
+                <div class="student-header">
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-code">${student.code}</div>
+                </div>
+                <div class="student-info">
+                    <span style="color: ${statusColor}">${status}</span>
+                    <span>${student.class}</span>
+                    <span>${daysLeft > 0 ? `${daysLeft} يوم` : 'منتهي'}</span>
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; color: #b0b0b0;">
+                    الهاتف: ${student.phone}
+                </div>
+            `;
+            
+            studentItem.addEventListener('click', () => {
+                // إزالة التحديد من جميع العناصر
+                document.querySelectorAll('.student-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                // إضافة التحديد للعنصر الحالي
+                studentItem.classList.add('selected');
+                // تحرير الطالب
+                editStudent(id, student);
+            });
+            
+            return studentItem;
+        }
+
+        // تحميل إحصائيات
+        async function loadStatistics() {
+            try {
+                showLoading(true);
+                const studentsSnapshot = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+                let totalRevenue = 0;
+                let activeCount = 0;
+                let expiringCount = 0;
+                const expiringSoon = [];
+                
+                studentsSnapshot.forEach(doc => {
+                    const student = doc.data();
+                    totalRevenue += student.subscriptionPrice || 0;
+                    
+                    if (student.active) {
+                        activeCount++;
+                        
+                        const endDate = new Date(student.endDate);
+                        const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                        
+                        if (daysLeft <= 3 && daysLeft > 0) {
+                            expiringCount++;
+                            expiringSoon.push({
+                                id: doc.id,
+                                name: student.name,
+                                daysLeft: daysLeft,
+                                class: student.class,
+                                phone: student.phone
+                            });
+                        }
+                    }
+                });
+                
+                document.getElementById('totalStudents').textContent = studentsSnapshot.size;
+                document.getElementById('activeStudents').textContent = activeCount;
+                document.getElementById('expiringStudents').textContent = expiringCount;
+                document.getElementById('totalRevenue').textContent = totalRevenue + ' ج';
+                
+                // عرض الطلاب على وشك الانتهاء
+                const expiringList = document.getElementById('expiringSoonList');
+                expiringList.innerHTML = '';
+                
+                if (expiringSoon.length > 0) {
+                    expiringSoon.forEach(student => {
+                        const div = document.createElement('div');
+                        div.className = 'student-item';
+                        div.innerHTML = `
+                            <div class="student-header">
+                                <div class="student-name">${student.name}</div>
+                                <div style="color: #ff9800; font-weight: bold;">${student.daysLeft} يوم</div>
+                            </div>
+                            <div class="student-info">
+                                <span>${student.class}</span>
+                                <span>${student.phone}</span>
+                            </div>
+                        `;
+                        expiringList.appendChild(div);
+                    });
+                } else {
+                    expiringList.innerHTML = '<div style="text-align: center; padding: 20px; color: #b0b0b0;">لا يوجد طلاب على وشك الانتهاء</div>';
+                }
+                
+                showLoading(false);
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+                showMessage('حدث خطأ في تحميل الإحصائيات', 'error');
+                showLoading(false);
+            }
+        }
+
+        // تحميل معلومات الفصل
+        async function loadClassInfo(className) {
+            try {
+                const q = query(collection(db, COLLECTIONS.CLASS_INFO), where("className", "==", className));
+                const querySnapshot = await getDocs(q);
+                
+                document.getElementById('currentClassInfo').style.display = 'block';
+                
+                if (!querySnapshot.empty) {
+                    const classData = querySnapshot.docs[0].data();
+                    document.getElementById('classNews').value = classData.news || '';
+                    document.getElementById('classHomework').value = classData.homework || '';
+                    
+                    if (classData.groupHomework) {
+                        document.getElementById('saturdayGroup').value = classData.groupHomework.saturday || '';
+                        document.getElementById('tuesdayGroup').value = classData.groupHomework.tuesday || '';
+                        document.getElementById('thursdayGroup').value = classData.groupHomework.thursday || '';
+                    }
+                    
+                    // عرض معلومات الفصل الحالية
+                    const classInfoDisplay = document.getElementById('classInfoDisplay');
+                    classInfoDisplay.innerHTML = `
+                        <div><strong>الفصل:</strong> ${className}</div>
+                        <div><strong>آخر تحديث:</strong> ${new Date(classData.updatedAt).toLocaleDateString('ar-EG')}</div>
+                    `;
+                } else {
+                    // إعادة تعيين إذا لم توجد بيانات
+                    document.getElementById('classNews').value = '';
+                    document.getElementById('classHomework').value = '';
+                    document.getElementById('saturdayGroup').value = '';
+                    document.getElementById('tuesdayGroup').value = '';
+                    document.getElementById('thursdayGroup').value = '';
+                    
+                    const classInfoDisplay = document.getElementById('classInfoDisplay');
+                    classInfoDisplay.innerHTML = `
+                        <div><strong>الفصل:</strong> ${className}</div>
+                        <div><strong>الحالة:</strong> لا توجد معلومات مسبقة</div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('خطأ في تحميل معلومات الفصل:', error);
+                showMessage('حدث خطأ في تحميل معلومات الفصل', 'error');
+            }
+        }
+
+        // حفظ معلومات الفصل
+        document.getElementById('saveClassInfoBtn').addEventListener('click', async () => {
+            if (!selectedClassForNews) {
+                showMessage('يرجى اختيار فصل أولاً', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const classData = {
+                    className: selectedClassForNews,
+                    news: document.getElementById('classNews').value,
+                    homework: document.getElementById('classHomework').value,
+                    groupHomework: {
+                        saturday: document.getElementById('saturdayGroup').value,
+                        tuesday: document.getElementById('tuesdayGroup').value,
+                        thursday: document.getElementById('thursdayGroup').value
+                    },
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: 'dashboard'
+                };
+                
+                // البحث عن سجل موجود
+                const q = query(collection(db, COLLECTIONS.CLASS_INFO), where("className", "==", selectedClassForNews));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    // تحديث السجل الموجود
+                    await updateDoc(doc(db, COLLECTIONS.CLASS_INFO, querySnapshot.docs[0].id), classData);
+                    showMessage('تم تحديث معلومات الفصل بنجاح', 'success');
+                } else {
+                    // إنشاء سجل جديد
+                    classData.createdAt = new Date().toISOString();
+                    await addDoc(collection(db, COLLECTIONS.CLASS_INFO), classData);
+                    showMessage('تم حفظ معلومات الفصل بنجاح', 'success');
+                }
+                
+            } catch (error) {
+                console.error('خطأ في حفظ معلومات الفصل:', error);
+                showMessage('حدث خطأ في الحفظ', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // بحث عن طالب للتعديل
+        document.getElementById('searchStudent').addEventListener('input', async (e) => {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            
+            if (searchTerm.length < 1) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            
+            try {
+                const studentsSnapshot = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+                const results = [];
+                
+                studentsSnapshot.forEach(doc => {
+                    const student = doc.data();
+                    const searchFields = [
+                        student.name?.toLowerCase(),
+                        student.code,
+                        student.phone,
+                        student.class
+                    ];
+                    
+                    if (searchFields.some(field => field && field.includes(searchTerm))) {
+                        results.push({ id: doc.id, ...student });
+                    }
+                });
+                
+                displaySearchResults(results);
+                
+            } catch (error) {
+                console.error('خطأ في البحث:', error);
+                showMessage('حدث خطأ في البحث', 'error');
+            }
+        });
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('searchResults');
+            container.innerHTML = '';
+            
+            if (results.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 30px; color: #b0b0b0;">لا توجد نتائج</div>';
+                return;
+            }
+            
+            results.forEach(student => {
+                const endDate = new Date(student.endDate);
+                const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                
+                const div = document.createElement('div');
+                div.className = 'student-item';
+                div.innerHTML = `
+                    <div class="student-header">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-code">${student.code}</div>
+                    </div>
+                    <div class="student-info">
+                        <span>${student.class}</span>
+                        <span>${student.phone}</span>
+                        <span>${daysLeft} يوم متبقي</span>
+                    </div>
+                `;
+                
+                div.addEventListener('click', () => {
+                    // إزالة التحديد من جميع العناصر
+                    document.querySelectorAll('#searchResults .student-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    // إضافة التحديد للعنصر الحالي
+                    div.classList.add('selected');
+                    // تحرير الطالب
+                    editStudent(student.id, student);
+                });
+                
+                container.appendChild(div);
+            });
+        }
+
+        // تحرير الطالب
+        async function editStudent(studentId, studentData) {
+            showLoading(true);
+            currentEditingStudent = studentId;
+            currentStudentData = studentData;
+            
+            try {
+                // البحث عن بيانات الطالب الإضافية
+                const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", studentId));
+                const querySnapshot = await getDocs(q);
+                
+                document.getElementById('editingStudentName').textContent = `تعديل بيانات: ${studentData.name}`;
+                
+                const endDate = new Date(studentData.endDate);
+                const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                
+                document.getElementById('editingStudentInfo').innerHTML = `
+                    <span>الفصل: ${studentData.class}</span>
+                    <span>الكود: ${studentData.code}</span>
+                    <span>${daysLeft} يوم متبقي</span>
+                `;
+                
+                if (!querySnapshot.empty) {
+                    const studentInfo = querySnapshot.docs[0].data();
+                    
+                    document.getElementById('studentLevel').value = studentInfo.level || '';
+                    document.getElementById('studentBehavior').value = studentInfo.behavior || '';
+                    document.getElementById('studentHomeworkStatus').value = studentInfo.homeworkStatus || '';
+                    
+                    // عرض الدرجات
+                    const gradesList = document.getElementById('gradesList');
+                    gradesList.innerHTML = '';
+                    
+                    if (studentInfo.grades && studentInfo.grades.length > 0) {
+                        studentInfo.grades.forEach((grade, index) => {
+                            const gradeDiv = document.createElement('div');
+                            gradeDiv.className = 'grade-item';
+                            gradeDiv.innerHTML = `
+                                <div>
+                                    <strong>${grade.title}</strong><br>
+                                    <small>${grade.value} / 100</small>
+                                </div>
+                                <button class="btn btn-small btn-danger delete-grade" data-index="${index}">حذف</button>
+                            `;
+                            gradesList.appendChild(gradeDiv);
+                        });
+                        
+                        // إضافة مستمعي الأحداث لأزرار الحذف
+                        document.querySelectorAll('.delete-grade').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                e.stopPropagation();
+                                const index = parseInt(btn.dataset.index);
+                                await deleteGrade(studentId, index);
+                            });
+                        });
+                    }
+                }
+                
+                document.getElementById('studentEditForm').style.display = 'block';
+                showLoading(false);
+                
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات الطالب:', error);
+                showMessage('حدث خطأ في تحميل بيانات الطالب', 'error');
+                showLoading(false);
+            }
+        }
+
+        // حذف درجة
+        async function deleteGrade(studentId, gradeIndex) {
+            if (!confirm('هل تريد حذف هذه الدرجة؟')) return;
+            
+            try {
+                const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", studentId));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docId = querySnapshot.docs[0].id;
+                    const studentInfo = querySnapshot.docs[0].data();
+                    
+                    const updatedGrades = [...(studentInfo.grades || [])];
+                    updatedGrades.splice(gradeIndex, 1);
+                    
+                    await updateDoc(doc(db, COLLECTIONS.STUDENT_DATA, docId), {
+                        grades: updatedGrades,
+                        updatedAt: new Date().toISOString()
+                    });
+                    
+                    showMessage('تم حذف الدرجة بنجاح', 'success');
+                    // إعادة تحميل بيانات الطالب
+                    editStudent(studentId, currentStudentData);
+                }
+            } catch (error) {
+                console.error('خطأ في حذف الدرجة:', error);
+                showMessage('حدث خطأ في حذف الدرجة', 'error');
+            }
+        }
+
+        // إضافة درجة للطالب
+        document.getElementById('addGradeBtn').addEventListener('click', async () => {
+            const title = document.getElementById('gradeTitle').value;
+            const value = parseInt(document.getElementById('gradeValue').value);
+            
+            if (!title || !value || value < 0 || value > 100) {
+                showMessage('يرجى إدخال عنوان صحيح وقيمة بين 0 و 100', 'error');
+                return;
+            }
+            
+            try {
+                const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", currentEditingStudent));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docId = querySnapshot.docs[0].id;
+                    const studentInfo = querySnapshot.docs[0].data();
+                    
+                    const updatedGrades = [...(studentInfo.grades || []), { title, value }];
+                    
+                    await updateDoc(doc(db, COLLECTIONS.STUDENT_DATA, docId), {
+                        grades: updatedGrades,
+                        updatedAt: new Date().toISOString()
+                    });
+                    
+                    showMessage('تم إضافة الدرجة بنجاح', 'success');
+                    
+                    // إعادة تعيين الحقول
+                    document.getElementById('gradeTitle').value = '';
+                    document.getElementById('gradeValue').value = '';
+                    
+                    // إعادة تحميل بيانات الطالب
+                    editStudent(currentEditingStudent, currentStudentData);
+                }
+                
+            } catch (error) {
+                console.error('خطأ في إضافة الدرجة:', error);
+                showMessage('حدث خطأ في إضافة الدرجة', 'error');
+            }
+        });
+
+        // حفظ معلومات الطالب
+        document.getElementById('saveStudentInfoBtn').addEventListener('click', async () => {
+            if (!currentEditingStudent) {
+                showMessage('يرجى اختيار طالب أولاً', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", currentEditingStudent));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const docId = querySnapshot.docs[0].id;
+                    
+                    await updateDoc(doc(db, COLLECTIONS.STUDENT_DATA, docId), {
+                        level: document.getElementById('studentLevel').value,
+                        behavior: document.getElementById('studentBehavior').value,
+                        homeworkStatus: document.getElementById('studentHomeworkStatus').value,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: 'dashboard'
+                    });
+                    
+                    showMessage('تم حفظ معلومات الطالب بنجاح', 'success');
+                } else {
+                    // إنشاء سجل جديد إذا لم يكن موجوداً
+                    const studentInfoData = {
+                        studentId: currentEditingStudent,
+                        studentName: currentStudentData.name,
+                        studentPhone: currentStudentData.phone,
+                        studentClass: currentStudentData.class,
+                        level: document.getElementById('studentLevel').value,
+                        behavior: document.getElementById('studentBehavior').value,
+                        homeworkStatus: document.getElementById('studentHomeworkStatus').value,
+                        grades: [],
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: 'dashboard'
+                    };
+                    
+                    await addDoc(collection(db, COLLECTIONS.STUDENT_DATA), studentInfoData);
+                    showMessage('تم إنشاء وحفظ معلومات الطالب بنجاح', 'success');
+                }
+                
+            } catch (error) {
+                console.error('خطأ في حفظ معلومات الطالب:', error);
+                showMessage('حدث خطأ في الحفظ', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // حذف طالب
+        document.getElementById('deleteStudentBtn').addEventListener('click', async () => {
+            if (!currentEditingStudent) {
+                showMessage('يرجى اختيار طالب أولاً', 'error');
+                return;
+            }
+            
+            if (!confirm('⚠️ تحذير: هل أنت متأكد من حذف هذا الطالب؟\n\nهذا الإجراء سيمنع الطالب من الدخول للنظام ولن يمكن التراجع عنه.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // التحقق من أن الاشتراك منتهي أولاً
+                const endDate = new Date(currentStudentData.endDate);
+                const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft > 0 && currentStudentData.active) {
+                    if (!confirm(`⚠️ هذا الطالب لا يزال اشتراكه فعالاً (متبقي ${daysLeft} يوم).\nهل تريد المتابعة مع حذف الطالب رغم ذلك؟`)) {
+                        showLoading(false);
+                        return;
+                    }
+                }
+                
+                // حذف من students collection
+                await deleteDoc(doc(db, COLLECTIONS.STUDENTS, currentEditingStudent));
+                
+                // حذف من student_data collection
+                const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", currentEditingStudent));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    await deleteDoc(doc(db, COLLECTIONS.STUDENT_DATA, querySnapshot.docs[0].id));
+                }
+                
+                // تحديث الكود في active_subscriptions ليكون غير مستخدم
+                const codeQuery = query(collection(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS), where("code", "==", currentStudentData.code));
+                const codeSnapshot = await getDocs(codeQuery);
+                
+                if (!codeSnapshot.empty) {
+                    await updateDoc(doc(db, COLLECTIONS.ACTIVE_SUBSCRIPTIONS, codeSnapshot.docs[0].id), {
+                        used: false,
+                        studentName: null,
+                        studentPhone: null,
+                        studentClass: null,
+                        deletedAt: new Date().toISOString()
+                    });
+                }
+                
+                showMessage('تم حذف الطالب بنجاح', 'success');
+                
+                // إعادة تعيين النموذج
+                document.getElementById('studentEditForm').style.display = 'none';
+                document.getElementById('searchStudent').value = '';
+                document.getElementById('searchResults').innerHTML = '';
+                currentEditingStudent = null;
+                currentStudentData = null;
+                
+                // تحديث القوائم
+                await loadStudents();
+                await loadStatistics();
+                
+            } catch (error) {
+                console.error('خطأ في حذف الطالب:', error);
+                showMessage('حدث خطأ في حذف الطالب', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // تعطيل الطلاب المنتهية اشتراكاتهم
+        document.getElementById('deactivateExpiredBtn').addEventListener('click', async () => {
+            if (!confirm('هل تريد تعطيل جميع الطلاب المنتهية اشتراكاتهم؟\n\nهذا الإعداد سيمنعهم من الدخول للنظام ولكن يحتفظ ببياناتهم.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const studentsSnapshot = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+                const today = new Date();
+                let deactivatedCount = 0;
+                
+                for (const docSnap of studentsSnapshot.docs) {
+                    const student = docSnap.data();
+                    const endDate = new Date(student.endDate);
+                    
+                    if (endDate < today && student.active) {
+                        await updateDoc(doc(db, COLLECTIONS.STUDENTS, docSnap.id), {
+                            active: false,
+                            deactivatedAt: new Date().toISOString()
+                        });
+                        deactivatedCount++;
+                    }
+                }
+                
+                showMessage(`تم تعطيل ${deactivatedCount} طالب منتهي الاشتراك`, 'success');
+                await loadStudents();
+                await loadStatistics();
+                
+            } catch (error) {
+                console.error('خطأ في تعطيل الطلاب:', error);
+                showMessage('حدث خطأ في التعطيل', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // حذف الطلاب المنتهية اشتراكاتهم نهائياً
+        document.getElementById('deleteExpiredBtn').addEventListener('click', async () => {
+            if (!confirm('⚠️ تحذير شديد: هل أنت متأكد من حذف جميع الطلاب المنتهية اشتراكاتهم نهائياً؟\n\nهذا الإجراء لا يمكن التراجع عنه وسيحذف جميع بيانات الطلاب المنتهية اشتراكاتهم بشكل نهائي.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const studentsSnapshot = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+                const today = new Date();
+                let deletedCount = 0;
+                
+                for (const docSnap of studentsSnapshot.docs) {
+                    const student = docSnap.data();
+                    const endDate = new Date(student.endDate);
+                    
+                    // حذف فقط الطلاب المنتهية اشتراكاتهم وغير نشطين
+                    if (endDate < today) {
+                        await deleteDoc(doc(db, COLLECTIONS.STUDENTS, docSnap.id));
+                        
+                        // حذف بيانات الطالب الإضافية
+                        const q = query(collection(db, COLLECTIONS.STUDENT_DATA), where("studentId", "==", docSnap.id));
+                        const querySnapshot = await getDocs(q);
+                        
+                        if (!querySnapshot.empty) {
+                            await deleteDoc(doc(db, COLLECTIONS.STUDENT_DATA, querySnapshot.docs[0].id));
+                        }
+                        
+                        deletedCount++;
+                    }
+                }
+                
+                showMessage(`تم حذف ${deletedCount} طالب منتهي الاشتراك`, 'success');
+                await loadStudents();
+                await loadStatistics();
+                
+            } catch (error) {
+                console.error('خطأ في حذف الطلاب:', error);
+                showMessage('حدث خطأ في الحذف', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // تصدير البيانات
+        document.getElementById('exportDataBtn').addEventListener('click', async () => {
+            showLoading(true);
+            
+            try {
+                const [studentsSnapshot, classInfoSnapshot, studentDataSnapshot] = await Promise.all([
+                    getDocs(collection(db, COLLECTIONS.STUDENTS)),
+                    getDocs(collection(db, COLLECTIONS.CLASS_INFO)),
+                    getDocs(collection(db, COLLECTIONS.STUDENT_DATA))
+                ]);
+                
+                const data = {
+                    students: [],
+                    classInfo: [],
+                    studentData: [],
+                    exportDate: new Date().toISOString(),
+                    system: "نظام المتابعة الطلابية"
+                };
+                
+                studentsSnapshot.forEach(doc => {
+                    data.students.push({ id: doc.id, ...doc.data() });
+                });
+                
+                classInfoSnapshot.forEach(doc => {
+                    data.classInfo.push({ id: doc.id, ...doc.data() });
+                });
+                
+                studentDataSnapshot.forEach(doc => {
+                    data.studentData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // إنشاء ملف JSON للتحميل
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `students_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('تم تصدير البيانات بنجاح', 'success');
+                
+            } catch (error) {
+                console.error('خطأ في تصدير البيانات:', error);
+                showMessage('حدث خطأ في التصدير', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // دوال المساعدة
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        // تحميل البيانات الأولية
+        loadStudents();
+        
+        // منع الإدخال غير الرقمي
+        document.getElementById('studentPhone').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        
+        document.getElementById('gradeValue').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value > 100) this.value = 100;
+        });
+
+        console.log('لوحة التحكم جاهزة للاستخدام');
+    </script>
+</body>
+</html>
